@@ -1,219 +1,233 @@
 ---
 name: task-plan-mode
-description: AI Agent task planning mode — auto-classify complex tasks, execute phase-by-phase with deep context research, non-generic requirements gathering, and data-driven output.
+description: Evidence-driven task planning mode. Before writing anything, collect real materials — files, links, brand assets, historical content — and extract traceable facts. Output must cite specific projects, names, dates, and sources.
 agent_created: true
-version: 5.0.0
+version: 6.0.0
 created: 2026-05-17
 updated: 2026-05-17
 references:
   - Codex Plan Mode
-  - task-decompose
-  - plan-mode-benchmark
+  - Olin's evidence-driven execution critique
 ---
 
 # task-plan-mode
 
-> **v5.0.0 — AI Agent task planning behavior specification / AI Agent 任务规划行为规范**
+> **v6.0.0 — Evidence-Driven Task Execution / 证据驱动型任务执行规范**
 
-A skill that transforms unstructured user requests into structured, phase-by-phase execution — with real context research, non-generic requirements, and data-driven output.
+**Not intent-driven. Evidence-driven.** The default failure mode of AI task planning is: ask generic questions → build a pretty structure → repackage the user's own words. The output looks complete but has zero information density.
 
-**Core principle / 核心原则:** Knowing "what to do" is not enough. The skill must also tell the agent "how to dig deeper, where to find data, and how to detect shallow output."
+This skill breaks that cycle with three hard constraints:
 
----
-
-## 1. The Problem / 为什么需要这个模式
-
-### English
-
-When a user asks an AI agent to do something complex, the naive approach produces:
-
-| Failure | Symptom | Root Cause |
-|---------|---------|------------|
-| Generic requirements | "Who is your audience?" → "Tech readers" — no depth | No context research before asking |
-| Empty framework | Output has structure but no real content | Agent fills templates, not actual work |
-| No data | Report with no citations, no numbers, no references | Agent never looked up external sources |
-
-**task-plan-mode** solves all three by enforcing:
-1. **Phase 0: Context research** — always look up the user's context before asking anything
-2. **Structured deepening** — don't accept generic answers; push for specifics
-3. **Data-driven output** — every deliverable must cite real sources
-
-### 中文
-
-当用户要求 AI agent 做复杂任务时，默认做法会产生三种通病：
-
-| 失败模式 | 表象 | 根本原因 |
-|---------|------|---------|
-| 需求模板化 | "目标读者是谁？"→"技术读者"——问了等于没问 | 问之前没做过背景研究 |
-| 框架感 | 有结构没内容，全是套话 | AI 填模板，不是真做事 |
-| 无数据引用 | 报告没有出处、没有数据、没有参考资料 | AI 从来没搜过外部信息 |
-
-**task-plan-mode** 通过三条纪律解决：
-1. **Phase 0: 背景研究** — 问任何问题之前，先搜用户背景
-2. **结构化深挖** — 不接受泛泛答案，持续追问到具体
-3. **数据驱动产出** — 每个交付物必须引用真实来源
+| Constraint / 约束 | Rule / 规则 |
+|-----------------|------------|
+| **Facts / 事实约束** | Never ask "what do you want?" First ask "what do you have?" Get files, links, brand assets, historical content. |
+| **Evidence / 证据约束** | Every output paragraph must reference at least one traceable source: project name, date, product spec, data point, quote, image, or URL. |
+| **Verification / 验证约束** | Read / extract / confirm before you write. If you can't cite a source for a claim, don't make the claim. |
 
 ---
 
-## 2. Decision Tree / 决策树 + 上下文感知
+## 1. The Problem / 问题
 
-### 2.1 Classification with context / 带上下文感知的分类
+### 1.1 The hollow output pattern / 空心产出模式
+
+Most AI "task planners" follow this hidden pattern:
 
 ```
-User request received
-      │
-      ▼
-┌────────────────────────────────────────────┐
-│  Phase 0: Context Research (NEW!)          │
-│  Before asking anything, search for:       │
-│  - User's company / brand / past work      │
-│  - Mentioned domain / industry trends      │
-│  - Any links or references in the request  │
-│                                            │
-│  Tools: web_fetch(user's links)            │
-│         exec(curl search) for industry     │
-└────────────────────┬───────────────────────┘
-                     │
-                     ▼
-┌────────────────────────────────────────────┐
-│  Does the task require >2 steps?           │
-└────────────┬───────────┬───────────────────┘
-             │ Yes        │ No
-             ▼            ▼
-         Plan mode     Direct reply
+1. Ask 2-3 generic questions ("who is your audience?", "what style?")
+2. Build a beautiful structure (headings, sections, tables)
+3. Fill it with the user's own words from step 1, slightly rephrased
 ```
 
-### 2.2 Phase sequencing with depth / 带深度的阶段序列
+**Result:** Looks complete. Has zero information density. No real data, no cases, no numbers, no traceable sources.
 
-| Type / 类型 | Phase sequence / 阶段序列 | Deep execution note / 深度执行要点 |
-|-------------|--------------------------|-----------------------------------|
-| Software dev | R → Front → Back → Integ → Del | Before coding, web_fetch similar projects for reference |
-| Content writing | Context → R → Research → Outline → Draft → Polish | Before drafting, search for actual data / quotes / cases |
-| Research & Analysis | Context → R → Data → Analysis → Viz → Del | Every data point must be from a real source |
-| Newsletter / Brief | Context → Scope → Gather → Org → Push | Gather from real feeds, not generated filler |
-| Platform ops | Context → Topic → Research → Draft → Design → Review | Search author's past content for tone consistency |
-| Data analysis | Context → R → Acquire → Clean → Analyze → Viz | Real datasets only |
-| Design | Context → Brief → Concept → Refine → Export | Search for style references |
-| Project planning | Context → Scope → Plan → Decompose → Risk → Pkg | Search for actual competitive landscape |
+### 1.2 Root cause / 根因
 
-**Rule / 规则:** Phase 0 (Context Research) is mandatory for all task types. Skip only if user says "no research needed."
+The skill asks about **intent** (what do you want?) instead of **evidence** (what do you have?).
 
----
-
-## 3. Phase 0: Context Research / 背景研究（新增，强制）
-
-### 3.1 What to search for / 搜什么
-
-Before asking a single question, search for:
-
-| Target / 搜索目标 | Tool / 工具 | Example / 示例 |
-|------------------|------------|---------------|
-| Any links the user provided in the request | `web_fetch(url)` | User says "write about our product ev-charge-x" → web_fetch their product page |
-| User's company / brand / past content | If user mentioned a brand name → `web_fetch` their website + news | If none provided → ask: "Can you share a link or your brand name so I can research your context?" |
-| Domain-specific context | `web_fetch` or search API | "具身智能 2025 趋势" → gather latest data |
-| Reference materials | `web_fetch` links | Academic papers, competitor products |
-
-### 3.2 When no user context is available / 没有用户上下文怎么办
-
-If the user provided **no links, no brand name, no identifiers** (e.g., just "帮我写一篇车联网的文章"):
-
-1. Ask once: "Can you share any reference links, your brand name, or past work examples so I can tailor the output?"
-2. If they can't provide any → proceed with general knowledge + industry-wide web search on the topic
-3. Clearly label any assumptions you make
-
-### 3.3 Output / 产出
-
-A **context summary** (saved as `plan.md` context section) containing:
-
-- What I found about the user's context
-- Key data points / quotes / references I can use
-- What information is still missing that I need to ask
-
-### 3.4 Anti-pattern / 反模式
-
-**Do NOT** ask questions that could have been answered by 30 seconds of web searching.
-
-| Bad (don't do this) | Good (do this instead) |
+| Intent-driven (bad) | Evidence-driven (good) |
 |--------------------|----------------------|
-| "What does your company do?" | "I searched your company and found [summary of public info]. Should I focus on [topic A] or [topic B]?" |
-| "Who is your audience?" | "I found your publication covers [domain]. Are readers mainly [segment A] or [segment B]?" |
-| "What data do you need?" | "I searched for embodied AI market data 2025 and found a report forecasting $xxB by 2030. I'll use this as a starting point and add more sources as I go." |
+| "What topic?" | "What files, articles, or data do you have on this topic?" |
+| "Who is your audience?" | "Share 2-3 past articles you liked — I'll match their tone and depth." |
+| "What features?" | "Do you have a product spec sheet, brand guidelines, or screenshots?" |
+| "What style?" | "What existing content (yours or a competitor's) should I reference?" |
 
 ---
 
-## 4. Phase Definitions / 阶段定义（带深度指引）
+## 2. Core Philosophy / 核心哲学
 
-### 4.1 Requirements gathering / 需求收集
-
-#### 4.1.1 Before asking / 问之前
-
-Always complete Phase 0 (context research) first. Your questions should demonstrate you've done your homework.
-
-#### 4.1.2 Deep questioning pattern / 深挖式提问
-
-Don't accept generic answers. Push for specifics:
-
-| Template question / 模板 | Deep follow-up / 深挖追问 |
-|--------------------------|-------------------------|
-| "Who is the target user?" → they say "tech readers" | "Specifically, which tech readers? CTOs making purchase decisions, or developers building with it? Their reading depth and pain points are very different." |
-| "What are the key features?" → they list 3 | "If you had to prioritize by user pain, which feature solves the biggest real problem? Can you describe a scenario where a user would choose this over competitors?" |
-| "What style?" → they say "professional" | "What's a WeChat article from 电铲研讯 you liked? I'll match that tone." |
-
-#### 4.1.3 Auto-enhancement rule / 自动增强规则
-
-If after 3 rounds the user's answers are still generic → the agent must:
-1. Recognize: "I'm getting generic answers, I need to do my own research"
-2. Search independently for the topic
-3. Present findings to the user: "I found some specific data. Let me use this to fill in the gaps."
-
-### 4.2 Research / Data collection / 资料搜集
-
-**Must use real sources. Never fabricate data.**
-
-| Type / 类型 | Where to look / 去哪找 |
-|-------------|----------------------|
-| Industry data | `web_fetch` industry reports, news, government stats |
-| Company info | Company website, news, investor presentations |
-| Academic papers | arXiv, Nature, Google Scholar |
-| Market trends | News aggregators, HN, analyst reports |
-| User's past content | Author's public articles, social media |
-
-**Each source must be cited in the output.** If a source is unavailable, note it: "No public data found for X — using estimated range Y-Z based on comparable industries."
-
-### 4.3 Drafting / Output / 撰写产出
-
-**The output must contain real content, not just structure.**
-
-Before marking a phase complete, self-check:
+### 2.1 Execution flow / 执行流程
 
 ```
-Quality checklist:
-☐ Does this contain at least 3 specific data points / quotes / examples?
-☐ Did I cite real sources for each major claim?
-☐ If someone read just the output, would they learn something new?
-☐ Could this be mistaken for an AI template? (If yes → rewrite.)
+Before: Intent-driven                   After: Evidence-driven
+
+"what do you want?"                     "what do you have?"
+       ↓                                        ↓
+  template questions                     collect materials (files, links, assets)
+       ↓                                        ↓
+  pretty structure                       extract evidence (facts, data, sources)
+       ↓                                        ↓
+  user's words rephrased                 build structure from real materials
+       ↓                                        ↓
+  hollow output                          verify traceability per paragraph
 ```
 
-If the output is "框架感" (framework-like, hollow), the agent must:
-1. Delete the filler
-2. Find real data to replace it
-3. Or ask the user: "I have the structure but the content feels hollow. Can you point me to a specific case or data source I should use?"
+### 2.2 The rule of three / 三段式纪律
+
+| Step / 步骤 | Action / 动作 | Skip if... / 跳过条件 |
+|------------|--------------|---------------------|
+| 1. Collect | Ask what materials exist. Read files, links, brand assets, historical content. Read them ALL before writing. | User says "I have nothing — just use your knowledge." |
+| 2. Extract | From the collected materials, extract: specific project names, dates, product specs, data points, quotes, image descriptions, URLs. Save as evidence list. | Only 1-2 superficial sources → note "thin evidence base" and state assumptions clearly. |
+| 3. Generate | Write structure + content. Every paragraph references at least one item from the evidence list. | A paragraph has zero evidence references → rewrite or delete. |
 
 ---
 
-## 5. Phase Transition / 阶段切换
+## 3. Phase Definitions / 阶段定义
 
-After each phase, output a completion report:
+### 3.0 Phase 0: Material Collection / 素材收集
+
+**Before asking any requirements question, ask what materials exist.**
+
+#### Questions to ask (not "what do you want" — but "what do you have")
+
+| Question / 问题 | Purpose / 目的 |
+|----------------|---------------|
+| "Do you have existing articles or past work on this topic?" | Read for tone, depth, style reference |
+| "Any brand guidelines, product spec sheets, or internal docs?" | Extract actual product/company facts |
+| "Any screenshots, images, data reports, or charts I can use?" | Real visual assets, not generated filler |
+| "Any competitor articles or reference links?" | Understand positioning and differentiation |
+| "Any internal meeting notes or project briefs?" | Ground the output in real project context |
+
+**If user provides nothing:**
+1. Note: "No real materials provided — output will be based on general knowledge"
+2. Search web for industry data on the topic
+3. Label all non-sourced content clearly as `[estimated]` / `[based on general knowledge]`
+
+#### Read everything before writing
+
+Do not ask all questions in sequence. Ask once, get the materials, READ them, then proceed.
+
+### 3.1 Phase 1: Evidence Extraction / 证据提取
+
+Read every provided material and extract:
 
 ```
-[Phase N/M done] — [phase name]
-Output: [file / doc name]
-Real sources used: [count]
-Next: [Phase N+1]
-Phase: N/M
+EVIDENCE LOG
+──────────────────────────────────────
+Source: [file name / URL]
+  - Fact: [specific project name, date]
+  - Fact: [specific data point with unit]
+  - Quote: "[exact quote]"
+  - Reference: [competitor / benchmark name]
+  - Asset: [image / chart description]
+  - Style note: [tone, format, voice observation]
+
+Source: [next file]
+  - ...
+──────────────────────────────────────
 ```
 
-Wait for user acknowledgment. If user is silent → proceed after 30 seconds.
+**Rule:** Do not start writing until you have at least 5 traceable evidence items. If you don't, ask the user for more materials.
+
+### 3.2 Phase 2: Structure from Evidence / 证据驱动的结构生成
+
+Build the structure based on what the evidence supports, not on a generic template.
+
+| Generic structure (bad) | Evidence-driven structure (good) |
+|------------------------|--------------------------------|
+| 1. Overview | 1. [Company name]'s [product] market position (from their 2025 investor deck) |
+| 2. Key features | 2. Case study: [project name] deployment at [client] (from their case study PDF) |
+| 3. Analysis | 3. Comparison: [Company] vs [Competitor] in [metric] (from their product spec) |
+| 4. Conclusion | 4. [Specific trend] in [specific market] (from industry report they provided) |
+
+### 3.3 Phase 3: Writing with Traceability / 可追溯写作
+
+Every paragraph must reference at least one source.
+
+| Without evidence (bad) | With evidence (good) |
+|-----------------------|---------------------|
+| "The product helps users improve efficiency." | "According to [Company]'s 2025 case study, [Client Name] reduced [metric] by 35% after adopting [Product Name]." |
+| "The market is growing rapidly." | "The global [Market Name] reached $[X]B in 2025, growing at [Y]% CAGR (source: [Report name], 2025)." |
+| "The design is user-friendly." | "The UI follows [Brand]'s design system (see brand guidelines, p.12). The dashboard shows [specific feature]." |
+
+### 3.4 Phase 4: Traceability Verification / 可追溯验证
+
+Before marking the phase complete:
+
+```
+TRACEABILITY CHECKLIST
+☐ Every paragraph has at least one specific name / number / date / location
+☐ Every major claim has a source (file name, URL, or user-provided material)
+☐ No paragraph would still make sense if written by someone with zero knowledge of the project
+☐ The output includes at least 3 traceable facts from the user's actual materials
+☐ If I removed all "in general / in the industry / many companies" phrases, would anything be left?
+
+→ If any checkbox is unchecked: rewrite the offending paragraph with evidence.
+→ If all checkboxes are checked: phase is complete.
+```
+
+---
+
+## 4. Agent Behavior / 行为规范
+
+### 4.1 First response / 第一响应
+
+```
+Evidence-driven plan:
+Phase 0: Collect materials — do you have any files, links, articles, or brand assets?
+Phase 1: Extract evidence from those materials
+Phase 2: Build structure from real facts
+Phase 3: Write with traceable citations
+Phase 4: Verify traceability
+
+To start Phase 0: Do you have any existing materials on this topic? Past articles, product docs, screenshots, or reference links?
+```
+
+### 4.2 Material-first rule / 材料优先
+
+**Do not** write anything substantive until the user has provided materials AND you have read them. If the user says "just write it without materials":
+
+1. Confirm: "Without your materials, the output will be based on general knowledge only and may lack specific facts. Is that acceptable?"
+2. If yes → proceed with general knowledge + web search
+3. Clearly label in the output: `[general knowledge — no project-specific materials provided]`
+
+### 4.3 Source annotation / 来源标注
+
+Throughout the document, annotate each source:
+
+```
+[Source: user's file "brand-guidelines-2025.pdf"]
+[Source: web_fetch — industry report X, 2025]
+[Source: general knowledge — cite if possible]
+[Estimated — no specific source found]
+```
+
+### 4.4 Self-termination / 空转终止
+
+If after 3 rounds of asking for materials the user still hasn't provided any serious inputs:
+
+```
+I've asked for materials 3 times and haven't received project-specific inputs.
+Proceeding with general knowledge only.
+All non-sourced content will be marked as [estimated].
+If you later provide materials, I can revise.
+```
+
+---
+
+## 5. Default Phase Sequences / 默认阶段序列
+
+| Type / 类型 | Phase sequence / 阶段序列 |
+|-------------|--------------------------|
+| Software dev | Collect → Extract → Structure → Code → Verify traceability |
+| Content writing | Collect → Extract → Outline → Draft → Verify traceability |
+| Research & Analysis | Collect → Extract → Data → Analysis → Verify traceability |
+| Newsletter / Brief | Collect → Extract → Organize → Write → Verify traceability |
+| Platform ops | Collect → Extract → Draft → Design → Verify traceability |
+| Data analysis | Collect → Extract → Clean → Analyze → Verify traceability |
+| Design | Collect → Extract → Concept → Refine → Verify traceability |
+| Project planning | Collect → Extract → Plan → Decompose → Verify traceability |
+
+Every sequence starts with "collect" and ends with "verify traceability."
 
 ---
 
@@ -221,29 +235,10 @@ Wait for user acknowledgment. If user is silent → proceed after 30 seconds.
 
 | Scenario / 场景 | Handling / 处理方式 |
 |----------------|-------------------|
-| User says "just do it, no planning" | Skip Phase 0 + Requirements, but still do context research silently |
-| User gives generic answers for 3+ rounds | Auto-research mode: stop asking, find data yourself, present findings |
-| No real data available publicly | Note "no public data found" + provide estimated range + mark as `estimated` |
-| User interrupts mid-phase | Stop, handle interruption, resume or re-plan |
-| Multi-agent dispatch | Assign phases, each agent does its own Phase 0 context research |
-| User silent after phase report | Proceed to next phase after 30s |
-| Task type unknown | Generate dynamic phase sequence + research context first |
-
----
-
-## 7. First Response Format / 第一响应
-
-```
-Phase 0 complete — context researched: [what I found]
-Plan:
-1. [Phase] — [specific scope derived from context]
-2. ...
-
-Starting with Phase 1: [context-aware question]?
-```
-
-**Before:**
-> "Who is your target audience?"
-
-**After (with Phase 0):**
-> "I looked up 电铲研讯's recent articles — your readers are tech industry professionals following new energy and smart hardware. For this article on embodied AI, should I write at a professional analysis level (deeper, more technical) or a broader industry overview level (more accessible)?"
+| User provides no materials | Default to general knowledge + web search. Mark all output as `[estimated]`. |
+| Materials are all links | `web_fetch` each link. Extract evidence from fetched content. |
+| Materials are local files | Use `read()` or `exec(cat)` to read. Extract evidence. |
+| Materials contain brand guidelines | Extract brand voice, tone rules, visual style, key terminology. Save as style reference. |
+| User provides screenshots | Describe them in alt text, reference them in writing. |
+| User says "just write without collecting" | Confirm intent, then proceed with general knowledge + mark as `[general knowledge]`. |
+| Evidence contradicts user's stated desire | Flag the contradiction. "Your materials say X, but you asked for Y. Which should I follow?" |
