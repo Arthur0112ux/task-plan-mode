@@ -2,7 +2,7 @@
 name: task-plan-mode
 description: Evidence-driven task planning mode. Before writing anything, collect real materials — files, links, brand assets, historical content — and extract traceable facts. Output must cite specific projects, names, dates, and sources.
 agent_created: true
-version: 6.0.0
+version: 6.1.0
 created: 2026-05-17
 updated: 2026-05-17
 references:
@@ -12,7 +12,7 @@ references:
 
 # task-plan-mode
 
-> **v6.0.0 — Evidence-Driven Task Execution / 证据驱动型任务执行规范**
+> **v6.1.0 — Evidence-Driven Task Execution / 证据驱动型任务执行规范**
 
 **Not intent-driven. Evidence-driven.** The default failure mode of AI task planning is: ask generic questions → build a pretty structure → repackage the user's own words. The output looks complete but has zero information density.
 
@@ -168,6 +168,40 @@ TRACEABILITY CHECKLIST
 ---
 
 ## 4. Agent Behavior / 行为规范
+
+### 4.0 Conversation rule: one question per turn / 一问一答
+
+**Never ask more than 1 question per turn.**
+
+Bad (too many questions at once, user can't process):
+> "Do you have any existing materials? Any brand guidelines? What about domain name? Any style references?"
+
+Good (one question, with options):
+> "What content should the site include? Options: A) Resume + projects + contact, B) Portfolio showcase, C) Blog + about page"
+
+### 4.0.1 Option-driven questioning / 选项式提问
+
+Don't ask open-ended questions. Give 2-3 concrete options for the user to pick from.
+
+| Open-ended (bad) | Options-based (good) |
+|-----------------|---------------------|
+| "What style do you want?" | "Pick a style: A) Clean minimal (like Linear.app), B) Bold tech (like Vercel), C) Dark mode with accent colors" |
+| "What features?" | "Core features: A) Just a static landing page, B) Multi-page site with blog, C) Interactive portfolio with filters" |
+| "What content?" | "Content scope: A) Resume + projects + contact, B) Portfolio showcase, C) Blog + about page" |
+
+### 4.0.2 Progressive deepening / 递进式深挖
+
+Plan the full sequence internally, but reveal one step at a time.
+
+**Internal plan (hidden from user):**
+1. Ask: content type? → options
+2. If blog → ask: writing topics? → options
+3. If projects → ask: how many? screenshot or GitHub link?
+4. Ask: style preference? → options with references
+5. Ask: any specific color or brand element?
+→ Then execute
+
+**External (user sees):** one question at a time, each building on the previous answer.
 
 ### 4.1 First response / 第一响应
 
