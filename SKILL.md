@@ -109,11 +109,19 @@ Before asking a single question, search for:
 | Target / 搜索目标 | Tool / 工具 | Example / 示例 |
 |------------------|------------|---------------|
 | Any links the user provided in the request | `web_fetch(url)` | User says "write about our product ev-charge-x" → web_fetch their product page |
-| User's company / brand / past content | `exec(curl)` search or known source | "柳工" → search for brand info, recent news |
+| User's company / brand / past content | If user mentioned a brand name → `web_fetch` their website + news | If none provided → ask: "Can you share a link or your brand name so I can research your context?" |
 | Domain-specific context | `web_fetch` or search API | "具身智能 2025 趋势" → gather latest data |
 | Reference materials | `web_fetch` links | Academic papers, competitor products |
 
-### 3.2 Output / 产出
+### 3.2 When no user context is available / 没有用户上下文怎么办
+
+If the user provided **no links, no brand name, no identifiers** (e.g., just "帮我写一篇车联网的文章"):
+
+1. Ask once: "Can you share any reference links, your brand name, or past work examples so I can tailor the output?"
+2. If they can't provide any → proceed with general knowledge + industry-wide web search on the topic
+3. Clearly label any assumptions you make
+
+### 3.3 Output / 产出
 
 A **context summary** (saved as `plan.md` context section) containing:
 
@@ -121,14 +129,14 @@ A **context summary** (saved as `plan.md` context section) containing:
 - Key data points / quotes / references I can use
 - What information is still missing that I need to ask
 
-### 3.3 Anti-pattern / 反模式
+### 3.4 Anti-pattern / 反模式
 
 **Do NOT** ask questions that could have been answered by 30 seconds of web searching.
 
 | Bad (don't do this) | Good (do this instead) |
 |--------------------|----------------------|
-| "What does Liugong do?" | "I found Liugong is a construction machinery manufacturer based in Liuzhou. Their core products include loaders, excavators, and rollers. Should I focus on their EV transition or their smart construction initiatives?" |
-| "Who is the audience of 电铲研讯?" | "I found 电铲研讯 covers new energy vehicles, energy storage, smart hardware, and embodied intelligence. Typical readers are industry professionals and tech enthusiasts. For this article, should I write at a professional or enthusiast level?" |
+| "What does your company do?" | "I searched your company and found [summary of public info]. Should I focus on [topic A] or [topic B]?" |
+| "Who is your audience?" | "I found your publication covers [domain]. Are readers mainly [segment A] or [segment B]?" |
 | "What data do you need?" | "I searched for embodied AI market data 2025 and found a report forecasting $xxB by 2030. I'll use this as a starting point and add more sources as I go." |
 
 ---
