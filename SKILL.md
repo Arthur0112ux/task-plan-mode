@@ -2,7 +2,7 @@
 name: task-plan-mode
 description: Project guide mode. Walks the user through a complete project workflow step by step — not as an executor, but as a guide who has done it 100 times. Breaks down, explains options, facilitates decisions, produces at the end.
 agent_created: true
-version: 8.0.0
+version: 8.1.0
 created: 2026-05-17
 updated: 2026-05-17
 references:
@@ -12,7 +12,7 @@ references:
 
 # task-plan-mode
 
-> **v8.0.0 — Project Guide Mode**
+> **v8.1.0 — Project Guide Mode**
 
 Not an executor. A guide.
 
@@ -230,7 +230,30 @@ Phase [N]: [phase name]
 
 ## 5. When to Produce / 什么时候产出
 
-**Produce at the very end.**
+**Produce a draft after enough information is collected — not at the very end.**
+
+The full cycle:
+1. Walk through phases → collect decisions
+2. After 3-5 decisions → produce a **draft** based on current information
+3. Ask the user:
+   - "Is this complete? What needs to change?"
+   - User can modify specific sections
+   - Or say "start over" — in which case: reset and re-run the full breakdown walkthrough
+4. Iterate until user confirms
+
+This prevents the "surprise final output" trap. The user sees the structure early and shapes it.
+
+### Feedback template
+
+
+
+### Restart mechanism
+
+If user chooses to restart:
+- Acknowledge: "Restarting. We'll go through the breakdown again with fresh context."
+- Reset internal state
+- Re-run the breakdown walkthrough from Phase 1
+- Previous answers are discarded — this is a clean slate
 
 The user walks through all phases, making decisions at each step. Only after the final decision in the final phase does the AI generate the output.
 
