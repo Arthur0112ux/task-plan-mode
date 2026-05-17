@@ -1,196 +1,194 @@
 ---
 name: task-plan-mode
-description: 任务规划模式（Plan Mode）。收到复杂任务时，AI 通过任务提示自动拆解，分阶段逐步执行。含通用任务类型对照表、各阶段执行指引、工具映射。
+description: When an agent receives a complex task, it enters plan mode: auto-classifies the task type, reveals an execution plan, and executes phase by phase with progress reporting.
 agent_created: true
-version: 3.1.0
+version: 3.2.0
 created: 2026-05-17
 updated: 2026-05-17
 references:
-  - Codex Plan Mode（行为参考）
+  - Codex Plan Mode
+  - task-decompose
 ---
 
-# task-plan-mode — 任务规划模式 v3.1
+# task-plan-mode
 
-> **任务提示模式：收到任务 → AI 按类型匹配执行方案 → 出计划 + 开始第一步。**
+> **Specification v3.2.0 — AI Agent task planning behavior.**
+
+When a user proposes a task involving >2 steps, missing critical context, or an ambiguous goal, the agent self-triggers into **plan mode**: it classifies the task, outputs a phase breakdown, and executes sequentially—one phase at a time—with a completion report after each.
+
+No explicit approval step is required. The plan is presented inline with the first response.
 
 ---
 
-## 一、核心流程
+## 1. Trigger Conditions
+
+### 1.1 Automatic triggers
+
+| Pattern | Example |
+|---------|---------|
+| Complex verb + deliverable noun | "Build a second-hand book trading mini-app" |
+| >2 implicit steps | "Write a report on EV battery trends" |
+| Missing scope/audience/context | "Help me make something about AI" |
+| Domain-specific keywords | "Design a landing page / Analyze the market" |
+
+### 1.2 Manual triggers
+
+- `plan mode`
+- `帮我拆解`
+- `先规划一下`
+
+---
+
+## 2. Task Type Reference
+
+The agent classifies the task against this table and executes the matching phase sequence.
+
+### 2.1 Software Development
+
+| Phase | Actions | Output | Completion Criteria |
+|-------|---------|--------|--------------------|
+| Requirements | Define target audience, feature list, tech stack | plan.md + feature spec | Core features + tech choices confirmed |
+| Frontend | Implement UI structure, interactions, styling | Source files | Core pages renderable |
+| Backend | API design, data model, business logic | Backend code + API docs | Core endpoints functional |
+| Integration | Frontend-backend wiring, smoke testing | Test report + run guide | Build runs without error |
+| Delivery | Documentation, packaging | README + deploy guide | User can operate independently |
+
+### 2.2 Content Writing
+
+| Phase | Actions | Output | Completion Criteria |
+|-------|---------|--------|--------------------|
+| Requirements | Define audience, thesis, length, tone | plan.md | Writing direction confirmed |
+| Research | Search, collect references, extract data | Reference doc | Material ready |
+| Outline | Structure, chapter breakdown | Outline doc | Chapter structure confirmed |
+| Draft | Write chapters sequentially | Full draft | Draft complete |
+| Polish | Format, proofread, add visuals | Final doc | Ready to publish |
+
+### 2.3 Research & Analysis
+
+| Phase | Actions | Output | Completion Criteria |
+|-------|---------|--------|--------------------|
+| Requirements | Define research question, scope, methodology | plan.md | Research plan confirmed |
+| Data collection | Gather industry data, policy, trends | Data summary | Key data points acquired |
+| Analysis | Structured breakdown, comparison, conclusions | Report body | Analysis complete |
+| Visualization | Charts, graphs, supporting images | Visuals + captions | Visuals ready |
+| Delivery | Final review, formatting | Final report | Deliverable |
+
+### 2.4 Newsletter / Daily Briefing
+
+| Phase | Actions | Output | Completion Criteria |
+|-------|---------|--------|--------------------|
+| Requirements | Define topic scope, coverage | Scope confirmed | Topic clear |
+| Gather | Search latest information | Item list | 5-8 items collected |
+| Organize | Categorize, summarize, comment | Brief body | Content complete |
+| Push | Deliver to user | Message | Delivered |
+
+### 2.5 Content Platform Operations
+
+| Phase | Actions | Output | Completion Criteria |
+|-------|---------|--------|--------------------|
+| Topic selection | Define angle, hook | Topic brief | Direction confirmed |
+| Research | Data, cases, references | Reference doc | Material ready |
+| Draft | Write body | Article draft | Draft complete |
+| Design | Cover image, inline visuals, layout | Formatted article | Ready to publish |
+| Review | Check links, formatting, typos | Final review | All clear |
+
+### 2.6 Data Analysis & Visualization
+
+| Phase | Actions | Output | Completion Criteria |
+|-------|---------|--------|--------------------|
+| Requirements | Define analysis goal, data sources | plan.md | Goal confirmed |
+| Acquisition | Download, scrape, query | Dataset | Data acquired |
+| Cleaning | Format, handle anomalies | Cleaned data | Ready to analyze |
+| Analysis | Statistics, comparison, modeling | Results | Conclusions drawn |
+| Visualization | Charts, dashboards | Visuals + annotations | Presentable |
+
+### 2.7 Design
+
+| Phase | Actions | Output | Completion Criteria |
+|-------|---------|--------|--------------------|
+| Requirements | Goals, style references, use cases | Design brief | Direction confirmed |
+| Concept | Creative direction, initial approach | Concept draft | Direction selected |
+| Refinement | Polish colors, typography, details | Final design | Detail complete |
+| Delivery | Source files, exports, specs | Design package | Ready to use |
+
+### 2.8 Project Planning
+
+| Phase | Actions | Output | Completion Criteria |
+|-------|---------|--------|--------------------|
+| Requirements | Goals, scope, constraints | Project brief | Scope defined |
+| Design | Architecture, roadmap, resource estimate | Plan doc | Feasible plan |
+| Decomposition | Milestones, assignments, timeline | Execution plan | Actionable |
+| Risk assessment | Edge cases, fallbacks | Risk register | Known risks addressed |
+| Delivery | Complete plan package | Final plan | Ready for review |
+
+---
+
+## 3. First Response Behavior
+
+Upon receiving a complex task, the agent:
+
+1. Matches the task to one of the 8 types above
+2. Outputs the phase plan **and** the first requirement question in a single response
+
+### Format
 
 ```
-用户提出任务
-      ↓
-AI 识别任务类型 → 匹配对照表中的阶段+工具+输出格式
-      ↓
-输出阶段规划 + 第一个需求问题
-      ↓
-逐轮对话推进（每次只推进 1 个环节）
-      ↓
-每个阶段完成后标注进度
-      ↓
-所有阶段完成 → 汇总交付
+Phase plan:
+1. [Phase name] — [what it covers]
+2. ...
+N. [Phase name]
+
+Starting with Phase 1: [first question to user]?
 ```
 
----
+### Rules
 
-## 二、触发规则
-
-### 自动触发
-
-| 触发条件 | 示例 |
-|---------|------|
-| 任务涉及 >2 个步骤 | 做网站、写报告、开发项目 |
-| 模糊需求、缺关键信息 | "帮我做一个关于新能源的东西" |
-| 包含复杂操作动词 + 复杂对象 | "做一个二手书交易小程序" |
-
-### 手动触发
-
-`规划模式` / `Plan Mode` / `帮我拆解` / `先规划一下`
+- Do not pause to ask "may I proceed?"—the plan is informative, not negotiative
+- If the user disagrees, they will naturally interrupt
+- Default: proceed as planned
 
 ---
 
-## 三、任务类型对照表（通用）
+## 4. Phase Execution
 
-### 1. 软件开发（网站/小程序/应用）
+### 4.1 Requirements gathering
 
-| 阶段 | 做什么 | 产出 | 完成标准 |
-|------|-------|------|---------|
-| 需求确认 | 目标用户、功能清单、技术选型 | plan.md + 功能清单 | 核心功能 + 技术方案已确认 |
-| 前端实现 | 页面结构、UI、交互 | 代码文件（HTML/CSS/JS） | 核心页面可展示 |
-| 后端实现 | API、数据库、业务逻辑 | 后端代码 + API 文档 | 核心接口可用 |
-| 集成测试 | 前后端对接、功能测试 | 测试记录 + 运行说明 | 可运行 |
-| 交付 | 文档 + 部署方式 | README + 运行指南 | 用户可操作 |
+- One question per turn
+- Maximum 2 follow-ups per question—if the user cannot answer, provide a default and mark as `confirmed_by_default`
 
-### 2. 文章/报告写作（深度内容）
+### 4.2 Phase completion report
 
-| 阶段 | 做什么 | 产出 | 完成标准 |
-|------|-------|------|---------|
-| 需求确认 | 目标读者、核心论点、篇幅风格 | plan.md | 写作方向确认 |
-| 资料搜集 | 搜索数据、找引用、抓取资料 | 参考资料文档 | 素材到位 |
-| 大纲 | 文章结构、章节划分 | 大纲文档 | 结构确认 |
-| 正文撰写 | 逐章写作 | 完整文章 | 文章完成 |
-| 排版交付 | 配图、校对、格式化 | 最终版文档 | 可发布 |
-
-### 3. 研究与分析（行业报告/调研）
-
-| 阶段 | 做什么 | 产出 | 完成标准 |
-|------|-------|------|---------|
-| 需求确认 | 研究问题、范围、方法 | plan.md | 研究方案确认 |
-| 数据搜集 | 行业数据、政策、趋势 | 数据汇总 | 关键数据到位 |
-| 分析撰写 | 分章节分析、对比、结论 | 报告正文 | 分析完成 |
-| 图表制作 | 数据可视化、配图 | 图表 + 插图 | 图文并茂 |
-| 交付 | 终稿、校对 | 最终报告 | 可交付 |
-
-### 4. 信息简报/每日资讯
-
-| 阶段 | 做什么 | 产出 | 完成标准 |
-|------|-------|------|---------|
-| 需求确认 | 简报主题、覆盖范围 | 方向确认 | 主题明确 |
-| 资讯搜集 | 搜索最新信息 | 资讯列表 | 5-8 条信息 |
-| 内容组织 | 分类、摘要、点评 | 简报正文 | 内容完成 |
-| 推送 | 发送给用户 | 消息 | 已送达 |
-
-### 5. 内容平台运营（公众号/博客/社交媒体）
-
-| 阶段 | 做什么 | 产出 | 完成标准 |
-|------|-------|------|---------|
-| 选题确认 | 当期主题、切入角度 | 选题方案 | 方向确定 |
-| 资料搜集 | 数据、案例、引用 | 参考资料 | 素材到位 |
-| 撰写初稿 | 正文撰写 | 文章初稿 | 初稿完成 |
-| 配图排版 | 封面图、配图、格式 | 排版好的文章 | 可发布状态 |
-| 发布检查 | 链接、格式、校对 | 最终稿 | 确认无误 |
-
-### 6. 数据分析与可视化
-
-| 阶段 | 做什么 | 产出 | 完成标准 |
-|------|-------|------|---------|
-| 需求确认 | 分析目标、数据来源 | plan.md | 目标明确 |
-| 数据获取 | 下载/抓取/查询数据 | 数据集 | 数据到位 |
-| 数据清洗 | 格式化、异常处理 | 清洗后数据 | 可分析 |
-| 分析 | 统计、对比、模型 | 分析结果 | 结论产出 |
-| 可视化呈现 | 图表、报告 | 图表 + 说明 | 可展示 |
-
-### 7. 设计类（UI/平面/品牌）
-
-| 阶段 | 做什么 | 产出 | 完成标准 |
-|------|-------|------|---------|
-| 需求确认 | 设计目标、风格参考、使用场景 | 设计brief | 方向确认 |
-| 概念设计 | 创意方向、初步方案 | 概念稿 | 方向选定 |
-| 细化 | 细节打磨、配色、字体 | 设计稿 | 细节完成 |
-| 交付 | 源文件、导出、规范 | 设计文件包 | 可投入使用 |
-
-### 8. 项目规划/方案设计
-
-| 阶段 | 做什么 | 产出 | 完成标准 |
-|------|-------|------|---------|
-| 需求确认 | 项目目标、范围、约束 | 项目brief | 范围确定 |
-| 方案设计 | 架构、路线图、资源评估 | 方案文档 | 方案可行 |
-| 阶段分解 | 里程碑、分工、时间线 | 执行计划 | 可落地 |
-| 风险评估 | 潜在问题、备选方案 | 风险清单 | 已知风险已覆盖 |
-| 交付 | 完整方案包 | 方案终稿 | 可评审 |
-
----
-
-## 四、各阶段通用工具指引
-
-| 工具 | 适用场景 | 用法 |
-|------|---------|------|
-| `web_fetch(url)` | 搜资料、抓网页、找数据 | 所有"资料搜集"阶段 |
-| `exec(command)` | 执行命令、调 API、运行代码 | 数据调取、代码执行、API 调用 |
-| 文档工具 | 写文章、报告、存档 | 内容产出阶段 |
-| 消息工具 | 发送交付物、通知 | 推送阶段 |
-| 本地文件 | 代码产出、本地存档 | 代码阶段 |
-| 图像生成 | 封面图、配图、概念图 | 视觉产出阶段 |
-
----
-
-## 五、逐轮推进规则
-
-### 需求收集
-
-每轮 1 个问题，信息足够即进入下一阶段。
-
-每轮最多追问 2 次，用户给不出答案时默认建议 + 标注。
-
-### 阶段汇报
-
-每阶段完成后输出：
+After each phase, the agent outputs:
 
 ```
-✅ [阶段名] 完成
-产出：{文件/文档名称}
--> 下一步：[下一阶段]
-📌 当前：Phase N/M
+[Phase N/M done] — [phase name]
+Output: [file or output name]
+Next: [Phase N+1]
+Phase: N/M
 ```
+
+### 4.3 Completion criteria
+
+**A phase is complete when:**
+- Its output artifact has been produced
+- The completion criteria from section 2 have been met
+- The user can verify the output
+
+**The full task is complete when:**
+- All phases are `done`
+- The final deliverable is usable without further processing
+- The user has been notified
 
 ---
 
-## 六、完成标准
+## 5. Workspace (when used)
 
-### 阶段完成条件
-- 该阶段的**产出**已生成
-- **完成标准**已达成
-- 用户可看到/验证产出物
-
-### 任务完成条件
-- 所有阶段标记完成
-- 最终产出可直接使用
-- 已通知用户交付
-
----
-
-## 七、完整示例
+Optional workspace structure for persistent planning artifacts:
 
 ```
-用户：帮我写一份关于新能源汽车市场趋势的分析报告
-
-AI（识别类型 → 研究与分析，匹配阶段 3）：
-收到。这个任务我打算分 5 步走：
-① 需求确认 — 明确报告读者和范围
-② 数据搜集 — 搜索行业数据
-③ 分析撰写 — 分章节产出
-④ 图表制作
-⑤ 交付
-
-先开始第一步：这份报告的预期读者是公司内部还是外部发布？大概需要覆盖哪些时间范围？
+.plan-mode/
+├── plan.md
+├── requirements/
+├── phase-output/
+└── deliverables/
 ```
