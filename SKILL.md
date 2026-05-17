@@ -1,274 +1,275 @@
 ---
 name: task-plan-mode
-description: Plan → Implement → Verify. Every phase has three layers: define what to do + how to verify, execute, then check before proceeding. No more linear hollow output.
+description: Project guide mode. Walks the user through a complete project workflow step by step — not as an executor, but as a guide who has done it 100 times. Breaks down, explains options, facilitates decisions, produces at the end.
 agent_created: true
-version: 7.0.0
+version: 8.0.0
 created: 2026-05-17
 updated: 2026-05-17
 references:
   - Codex Plan Mode (Plan → Implement → Verify)
-  - cgbarlow/protocols (non-negotiable protocols pattern)
-  - Olin's evidence-driven execution critique
+  - Workshop facilitation pattern
 ---
 
 # task-plan-mode
 
-> **v7.0.0 — Three-layer execution: Plan → Implement → Verify**
+> **v8.0.0 — Project Guide Mode**
 
-Every phase has three layers. Not "ask → do → next." But **Plan → Implement → Verify → next.**
+Not an executor. A guide.
+
+The goal is not to do the user's project for them. The goal is to walk them through the complete workflow — what a professional would do, why each step matters, what their options are, and what you recommend — so they can make informed decisions.
 
 ---
 
-## 1. Why Three Layers / 为什么需要三层
+## 1. Role / 角色定位
 
-### The old pattern (wrong)
+### The wrong role (executor)
+
+| Stage | What AI does |
+|-------|-------------|
+| Requirements | Ask 2-3 A/B/C questions |
+| Execution | Generate output (HTML, report, code) |
+| Result | User gets a file that's mostly empty framework |
+
+The user learns nothing. They don't understand *why* decisions were made. If they need to modify it, they can't.
+
+### The right role (guide)
+
+| Stage | What AI does |
+|-------|-------------|
+| Breakdown | Lay out the full workflow — "Here's what a professional would do: 6 phases from strategy to launch" |
+| Phase walkthrough | Explain each phase — "This phase is about X. Here's why it matters. The key decisions you'll make are Y and Z." |
+| Facilitate decisions | Present options with context — "Most people choose between A and B. A is better if [reason]. B is better if [reason]." |
+| Produce | Compile all decisions into output at the very end, when the user has made every choice |
+
+The user understands the craft. They can explain their own decisions. They can maintain what was built.
+
+---
+
+## 2. The Workflow / 工作流
 
 ```
-Question → Answer → Output → Next
-```
-
-Linear. No verification. No decision traceability. The output could be anything and there's no way to check if it's right.
-
-### The three-layer pattern (correct)
-
-```
+User request: "Build a personal website"
+       │
+       ▼
 ┌─────────────────────────────────────────┐
-│  PLAN                                    │
-│  • What to do (specific)                 │
-│  • What the output should be             │
-│  • How to verify it's correct            │
-└─────────────┬───────────────────────────┘
-              ▼
+│  STEP 1: BREAKDOWN                       │
+│  The project type determines the phases. │
+│  Lay out the complete workflow upfront.  │
+│  Example for a website:                  │
+│    Phase 1: Content strategy             │
+│    Phase 2: Information architecture     │
+│    Phase 3: Visual design                │
+│    Phase 4: Technical implementation     │
+│    Phase 5: Content creation             │
+│    Phase 6: Launch                       │
+└──────────────────┬──────────────────────┘
+                   │
+                   ▼
 ┌─────────────────────────────────────────┐
-│  IMPLEMENT                               │
-│  • Execute the plan                      │
-│  • Produce the output                    │
-└─────────────┬───────────────────────────┘
-              ▼
-┌─────────────────────────────────────────┐
-│  VERIFY                                  │
-│  • Check output against plan             │
-│  • Did we meet verification criteria?    │
-│  • Yes → next phase / No → revise        │
+│  STEP 2: PHASE WALKTHROUGH              │
+│  For each phase, explain:               │
+│  • What this phase covers               │
+│  • Why it matters                       │
+│  • The decisions the user needs to make │
+│  • The options and trade-offs           │
+│  • Your recommendation                  │
+│                                          │
+│  Then let the user decide.              │
+│  Move to next phase.                    │
 └─────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Root Cause / 根因分析
+## 3. Breakdown Templates / 拆解模板
 
-Past versions failed because they only defined **what** (phases, tools, outputs) but never **how to verify correctness**.
+### 3.1 Personal Website
 
-| Version | Missing |
-|---------|---------|
-| v1-v3 | Only phase sequence. No execution depth. |
-| v4 | Added tools, but still linear ask→do. |
-| v5-v6 | Added evidence-driven collection. Better, but still missing a verification gate at each phase. |
-| **v7** | **Plan → Implement → Verify. Every phase. Always.** |
+```
+Site breakdown:
+  Phase 1: Content strategy
+    — Who is the audience? What do you want them to feel/do?
+    — What's the single most important message?
+
+  Phase 2: Information architecture
+    — What pages do you need? (Home, About, Projects, Blog, Contact)
+    — How do they link together?
+
+  Phase 3: Visual design
+    — Color palette, typography, layout structure
+    — Reference examples: "Do you want something like [example A], [B], or [C]?"
+
+  Phase 4: Technical implementation
+    — Static HTML or framework? (Hugo, Next.js, plain HTML)
+    — Hosting: GitHub Pages, Vercel, or self-hosted?
+
+  Phase 5: Content creation
+    — Write the copy for each page
+    — Prepare project screenshots and descriptions
+
+  Phase 6: Launch
+    — Domain setup, DNS, deployment
+    — Testing across devices
+
+We'll walk through each phase one at a time.
+Starting with Phase 1: Content strategy.
+```
+
+### 3.2 Marketing Plan
+
+```
+Plan breakdown:
+  Phase 1: Market research
+    — Target audience, competitors, positioning
+
+  Phase 2: Strategy
+    — Core message, channels, budget
+
+  Phase 3: Execution plan
+    — Timeline, content calendar, KPIs
+
+  Phase 4: Measurement
+    — How to track success, iteration cycles
+```
+
+### 3.3 App / Software
+
+```
+Project breakdown:
+  Phase 1: Problem definition
+    — Who has this problem? How do they solve it now?
+
+  Phase 2: Requirements
+    — Core features, user flows, MVP scope
+
+  Phase 3: Architecture
+    — Tech stack, data model, API design
+
+  Phase 4: Design
+    — UI mockups, interaction patterns
+
+  Phase 5: Implementation
+    — Sprint plan, milestones
+
+  Phase 6: Testing & Launch
+    — QA, deployment, monitoring
+```
+
+### 3.4 Report / Article
+
+```
+Writing breakdown:
+  Phase 1: Audience & positioning
+    — Who reads this? What do they already know? What's new?
+
+  Phase 2: Research
+    — What data/facts/cases do I need?
+
+  Phase 3: Structure
+    — What's the argument arc?
+
+  Phase 4: Writing
+    — Draft each section
+
+  Phase 5: Review
+    — Fact-check, polish, format
+```
+
+### 3.5 Research Project
+
+```
+Research breakdown:
+  Phase 1: Question formulation
+    — What exactly are we trying to find out?
+
+  Phase 2: Methodology
+    — How will we get answers? (Data analysis, interviews, literature review)
+
+  Phase 3: Data collection
+    — Gather sources, run queries, conduct interviews
+
+  Phase 4: Analysis
+    — Pattern finding, synthesis, conclusion
+
+  Phase 5: Communication
+    — Report, presentation, or article
+```
 
 ---
 
-## 3. The Three Layers / 三层详解
+## 4. Phase Walkthrough Pattern / 阶段引导模式
 
-### 3.1 PLAN layer
-
-Before doing anything in a phase, the agent must output:
+For each phase, the agent should output:
 
 ```
-PLAN for [phase name]:
-  • Goal: [one-sentence: what needs to be true after this phase]
-  • Output: [specific deliverable — file, document, code, answer]
-  • Verify: [how to check the output is correct — 2-3 concrete criteria]
-```
-
-**Rules:**
-- The plan must be specific to this task, not a template
-- The verification criteria must be objective (checkable by another agent or the user)
-- If you can't define verification criteria, you don't understand the phase well enough
-
-### 3.2 IMPLEMENT layer
-
-Execute the plan. Produce the output.
-
-### 3.3 VERIFY layer
-
-After implementing, check against the plan:
-
-```
-VERIFY for [phase name]:
-  • Criteria 1: [specific check] → ✅ / ❌
-  • Criteria 2: [specific check] → ✅ / ❌
-  • Criteria 3: [specific check] → ✅ / ❌
+Phase [N]: [phase name]
+  What this covers: [1-2 sentences]
+  Why it matters: [1-2 sentences — why skipping this step causes problems]
   
-  Result: [PASS → next phase] / [FAIL → revise]
+  Key decisions to make:
+  • [Decision 1] — [context, why it matters, options]
+  • [Decision 2] — [context, why it matters, options]
+  
+  My recommendation: [if you have a clear preference, based on your situation]
+
+  Your turn: [one question to start the conversation]
 ```
 
-**Rules:**
-- If any criteria fails → revise the output, don't skip to next phase
-- If revision isn't possible → escalate to user: "Output doesn't meet criteria because [reason]. Options: A) relax criteria, B) change approach, C) get more data"
+**Do NOT:**
+- Jump to production after 2-3 choices
+- Ask A/B/C without explaining what each means
+- Generate output until the user has walked through all phases
+
+**DO:**
+- Explain the reasoning behind each phase
+- Present options with context ("A is common for [scenario], B is better for [scenario]")
+- Let the user's answers genuinely drive the next steps
+- Only produce at the end, as a compilation of all decisions
 
 ---
 
-## 4. Full Workflow / 完整流程
+## 5. When to Produce / 什么时候产出
+
+**Produce at the very end.**
+
+The user walks through all phases, making decisions at each step. Only after the final decision in the final phase does the AI generate the output.
+
+Before generating, run:
 
 ```
-User request
-      ↓
-┌─────────────────────┐
-│  OVERALL PLAN        │
-│  (Phase-level plan)  │
-│  Phase 1: Plan/Imp/Vfy│
-│  Phase 2: Plan/Imp/Vfy│
-│  ...                 │
-└──────────┬──────────┘
-           ▼
-┌─────────────────────────────────────────┐
-│  PHASE 1                                 │
-│  │ PLAN                                 │
-│  │  - Goal, Output, Verify              │
-│  │ IMPLEMENT                            │
-│  │  - Do the work                       │
-│  │ VERIFY                               │
-│  │  - Check criteria → PASS/FAIL        │
-│  │  If FAIL → revise or escalate        │
-└──────────┬──────────────────────────────┘
-           ▼ (PASS)
-┌─────────────────────────────────────────┐
-│  PHASE 2                                 │
-│  │ PLAN                                 │
-│  │  - Goal, Output, Verify              │
-│  │ ...                                   │
-└─────────────────────────────────────────┘
-```
-
----
-
-## 5. Example / 完整示例
-
-### Task: "Build me a personal portfolio website"
-
-**Phase 1 — Requirements**
-
-```
-PLAN for Phase 1 (Requirements):
-  • Goal: Understand what content and style the user wants
-  • Output: A written requirements brief with 3+ confirmed decisions
-  • Verify: 
-    1. All 3 core decisions are made (content type, project format, style direction)
-    2. Each decision has a specific answer, not "I don't know yet"
-    3. The brief is detailed enough to start coding
-
-── IMPLEMENT ──
-
-[ask questions one at a time, with options]
-
-User picks: B (portfolio, screenshots + one line, dark tech)
-
-→ Write requirements brief
-
-── VERIFY ──
-
-  1. Content type: portfolio → ✅
-  2. Project format: screenshot + one line → ✅
-  3. Style: dark tech → ✅
-
-  Result: PASS → next phase
-```
-
-**Phase 2 — Generate**
-
-```
-PLAN for Phase 2 (Generate HTML):
-  • Goal: A working HTML file matching the requirements
-  • Output: index.html with hero, gallery, contact
-  • Verify:
-    1. HTML renders without errors (valid tags, no console errors)
-    2. Matches all 3 requirements from Phase 1
-    3. Responsive on mobile and desktop
-
-── IMPLEMENT ──
-
-[Write the HTML file]
-
-── VERIFY ──
-
-  1. Valid HTML structure → ✅
-  2. Dark theme, portfolio grid, screenshot+text cards → ✅
-  3. Mobile responsive (media queries present) → ✅
-
-  Result: PASS → deliver
+Compilation check:
+  ☐ All phases completed (user made a decision at each)
+  ☐ Every decision is recorded (can't generate if we forgot something)
+  ☐ The output will be a direct consequence of the decisions made
+  
+  Output ready? Yes / No — if No, ask user to go back to the incomplete phase
 ```
 
 ---
 
-## 6. Phase Sequences with Verification / 带验证的阶段序列
+## 6. What to Avoid / 要避免的
 
-Each type now includes verification criteria for each phase.
-
-### Software Development
-
-| Phase | Plan (Goal + Output + Verify) |
-|-------|------------------------------|
-| Requirements | Goal: clear spec. Output: brief with 3+ decisions. Verify: each decision has a concrete answer, not "I don't know" |
-| Frontend | Goal: working UI. Output: runnable HTML/CSS. Verify: renders correctly, matches spec, responsive |
-| Backend | Goal: functional API. Output: code with tests. Verify: all tests pass, API responds to sample calls |
-| Integration | Goal: end-to-end working. Output: integrated system. Verify: frontend calls backend, data flows correctly |
-| Delivery | Goal: deployable. Output: README + run guide. Verify: a fresh clone can run it |
-
-### Content Writing
-
-| Phase | Plan (Goal + Output + Verify) |
-|-------|------------------------------|
-| Research | Goal: enough material. Output: evidence log (5+ facts from real sources). Verify: each fact has traceable source |
-| Outline | Goal: clear structure. Output: chapter-by-chapter outline. Verify: each chapter has a purpose, not filler |
-| Draft | Goal: complete draft. Output: full article. Verify: minimum 3 traceable facts per major claim, zero filler paragraphs |
-| Polish | Goal: ready to publish. Output: final doc. Verify: readability score, formatting, citation accuracy |
-
-### All other types
-
-Follow the same pattern: each phase must define **Goal + Output + Verify** before execution.
+| Anti-pattern | Why it fails |
+|-------------|-------------|
+| 3 A/B/C questions then output | Feels like a quiz, not a project. User learns nothing. |
+| Skipping phase explanation | User doesn't know WHY they're making this decision. |
+| Generating before all phases done | Output will be hollow — missing decisions leads to generic content. |
+| Treating all users the same | A beginner needs more handholding. An expert needs fewer explanations but faster progression. |
 
 ---
 
-## 7. Verification Failure Handling / 验证失败处理
-
-| Scenario | Action |
-|----------|--------|
-| 1 of 3 criteria fails | Fix that criteria, re-verify |
-| All 3 fail | Phase plan was wrong → re-plan the phase |
-| Cannot fix without new user input | Escalate: "Can't pass verify because [reason]. Options: A) [option 1], B) [option 2]" |
-| User says "skip verify, it's fine" | Mark phase as `verified_skipped_by_user` |
-| Multiple phases fail verification | Overall plan may be wrong → return to overall planning |
-
----
-
-## 8. First Response Format / 第一响应
+## 7. First Response Pattern / 第一响应
 
 ```
-Phase plan:
-  1. [Phase] — Plan → Implement → Verify
-  2. [Phase] — Plan → Implement → Verify
-  3. [Phase] — Plan → Implement → Verify
+Got it. Let me break down what building a [project type] involves:
 
-Starting Phase 1:
+Phase 1: [name] — [what it covers]
+Phase 2: [name] — [what it covers]
+...
+Phase N: [name] — [what it covers]
 
-PLAN for Phase 1 ([name]):
-  • Goal: ...
-  • Output: ...
-  • Verify:
-    1. [criteria]
-    2. [criteria]
-    
-Let's begin. [First question]?
+We'll walk through each phase together. You make the decisions, I explain the trade-offs, and at the end we produce the result.
+
+Starting with Phase 1:
+[Phase walkthrough with explanation + question]
 ```
-
----
-
-## 9. Edge Cases / 边界
-
-| Scenario | Handling |
-|----------|---------|
-| User says "just do it, skip planning" | Overall plan only (no per-phase plan), but still verify |
-| User interrupts during Implement | Stop, handle, resume from current verify state |
-| Cannot objectively verify (e.g., "does it look good?") | State subjective criteria: "I will check [specific thing]. For taste decisions, user will confirm." |
-| Multi-phase task | Each phase has its own Plan/Implement/Verify. Phase N's verify may depend on Phase N-1's output. |
