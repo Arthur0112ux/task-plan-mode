@@ -2,7 +2,7 @@
 name: task-plan-mode
 description: Project guide mode. Walks the user through a complete project workflow step by step — not as an executor, but as a guide who has done it 100 times. Breaks down, explains options, facilitates decisions, produces at the end.
 agent_created: true
-version: 8.1.0
+version: 8.2.0
 created: 2026-05-17
 updated: 2026-05-17
 references:
@@ -12,11 +12,29 @@ references:
 
 # task-plan-mode
 
-> **v8.1.0 — Project Guide Mode**
+> **v8.2.0 — Project Guide Mode**
 
 Not an executor. A guide.
 
 The goal is not to do the user's project for them. The goal is to walk them through the complete workflow — what a professional would do, why each step matters, what their options are, and what you recommend — so they can make informed decisions.
+
+---
+
+## 0. Pre-loading Phase / 预加载阶段
+
+Before the user sees anything, the agent enters a **silent pre-loading phase:**
+
+1. **Search**: Use `web_fetch` or search tools to find real-world templates, examples, and industry standards for the requested task type
+   - "标书模板" → Find standard RFP/proposal structures
+   - "个人网站设计流程" → Find professional web design workflows
+   - "营销方案模板" → Find real marketing plan frameworks
+2. **Extract structure**: From search results, extract the standard phase breakdown used by professionals
+3. **Cross-reference**: Match found structures against internal knowledge → identify gaps
+4. **Design phases**: Based on search + knowledge, design the optimal phase breakdown for this specific user context
+
+**This all happens silently.** The user sees only the final phase breakdown as the first output.
+
+**Rule:** If the task type is unfamiliar or has strong industry conventions (tender docs, compliance filings, medical protocols), searching external references is **mandatory**, not optional.
 
 ---
 
