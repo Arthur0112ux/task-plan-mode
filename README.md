@@ -7,7 +7,7 @@
   <a href="https://github.com/Arthur0112ux/task-plan-mode/releases"><img src="https://img.shields.io/github/v/release/Arthur0112ux/task-plan-mode" alt="Version"></a>
 </p>
 
-> **让你的 AI Agent 拥有分步式任务拆解+执行能力，v2.0 新增前置评估流程**
+> **让你的 AI Agent 拥有分步式任务拆解+执行能力，v2.1 自然推进工作流**
 >
 > 复杂任务不再是"一轮对话就产出"。AI 先做前置评估 → 明确分几个阶段 → 每个阶段逐步执行 → 阶段间汇报进度。
 
@@ -112,14 +112,6 @@ task-plan-mode/
 │   └── *.md
 └── LICENSE
 ```
-
----
-
-## 🤝 贡献与更新
-
-每次优化后同步到两个位置：
-1. **GitHub 仓库** — 版本管理
-2. **AI 共享技能库** — 本机 agent 读取
 
 ---
 
