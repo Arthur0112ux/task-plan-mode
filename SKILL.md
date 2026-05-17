@@ -1,8 +1,8 @@
 ---
 name: task-plan-mode
-description: AI Agent task planning mode — auto-classify complex tasks, execute phase-by-phase with structured requirements gathering, outputs, and completion criteria. / AI Agent 任务规划模式 — 自动识别复杂任务，按阶段执行，含结构化需求收集、产出物与完成标准。
+description: AI Agent task planning mode — auto-classify complex tasks, execute phase-by-phase with deep context research, non-generic requirements gathering, and data-driven output.
 agent_created: true
-version: 4.0.0
+version: 5.0.0
 created: 2026-05-17
 updated: 2026-05-17
 references:
@@ -13,261 +13,229 @@ references:
 
 # task-plan-mode
 
-> **v4.0.0 — AI Agent task planning behavior specification / AI Agent 任务规划行为规范**
+> **v5.0.0 — AI Agent task planning behavior specification / AI Agent 任务规划行为规范**
 
-A skill that transforms unstructured user requests into structured, phase-by-phase execution. The agent classifies the task, reveals a breakdown plan inline with the first response, and executes each phase with a defined output and completion criterion.
+A skill that transforms unstructured user requests into structured, phase-by-phase execution — with real context research, non-generic requirements, and data-driven output.
+
+**Core principle / 核心原则:** Knowing "what to do" is not enough. The skill must also tell the agent "how to dig deeper, where to find data, and how to detect shallow output."
 
 ---
 
-## 1. Overview / 概述
+## 1. The Problem / 为什么需要这个模式
 
 ### English
 
-When a user asks an AI agent to do something complex—build an app, write a report, analyze a market—the naive approach is a single-shot answer. This fails for three reasons:
+When a user asks an AI agent to do something complex, the naive approach produces:
 
-| Failure | Why | Fix |
-|---------|-----|-----|
-| Context overflow | Long conversations bury early decisions | One phase at a time, document as you go |
-| Direction drift | AI starts building before scope is clear | Requirements phase first, always |
-| Incomplete output | User didn't specify enough to get a good result | Structured questioning, default fallbacks |
+| Failure | Symptom | Root Cause |
+|---------|---------|------------|
+| Generic requirements | "Who is your audience?" → "Tech readers" — no depth | No context research before asking |
+| Empty framework | Output has structure but no real content | Agent fills templates, not actual work |
+| No data | Report with no citations, no numbers, no references | Agent never looked up external sources |
 
-**task-plan-mode** solves all three by enforcing a predictable execution discipline.
+**task-plan-mode** solves all three by enforcing:
+1. **Phase 0: Context research** — always look up the user's context before asking anything
+2. **Structured deepening** — don't accept generic answers; push for specifics
+3. **Data-driven output** — every deliverable must cite real sources
 
 ### 中文
 
-当用户要求 AI agent 做复杂任务时，最朴素的做法就是一榔头回答。这在三个维度上注定失败：
+当用户要求 AI agent 做复杂任务时，默认做法会产生三种通病：
 
-| 失败模式 | 原因 | 解决 |
-|---------|------|------|
-| 上下文溢出 | 长对话掩埋早期决策 | 一次只做一个阶段，边做边记录 |
-| 方向偏差 | 范围未确定就开始做 | 永远先做需求阶段 |
-| 信息不全 | 用户没给够条件 | 结构化提问 + 默认兜底 |
+| 失败模式 | 表象 | 根本原因 |
+|---------|------|---------|
+| 需求模板化 | "目标读者是谁？"→"技术读者"——问了等于没问 | 问之前没做过背景研究 |
+| 框架感 | 有结构没内容，全是套话 | AI 填模板，不是真做事 |
+| 无数据引用 | 报告没有出处、没有数据、没有参考资料 | AI 从来没搜过外部信息 |
 
-**task-plan-mode** 通过可预测的执行纪律解决这三个问题。
+**task-plan-mode** 通过三条纪律解决：
+1. **Phase 0: 背景研究** — 问任何问题之前，先搜用户背景
+2. **结构化深挖** — 不接受泛泛答案，持续追问到具体
+3. **数据驱动产出** — 每个交付物必须引用真实来源
 
 ---
 
-## 2. Decision Tree / 决策树
+## 2. Decision Tree / 决策树 + 上下文感知
 
-### 2.1 Classification / 分类
+### 2.1 Classification with context / 带上下文感知的分类
 
 ```
 User request received
       │
       ▼
-┌─────────────────────────────────────┐
-│  Does the task require >2 steps?    │
-│  任务是否需要 2 步以上？             │
-└────────────┬───────────┬────────────┘
+┌────────────────────────────────────────────┐
+│  Phase 0: Context Research (NEW!)          │
+│  Before asking anything, search for:       │
+│  - User's company / brand / past work      │
+│  - Mentioned domain / industry trends      │
+│  - Any links or references in the request  │
+│                                            │
+│  Tools: web_fetch(user's links)            │
+│         exec(curl search) for industry     │
+└────────────────────┬───────────────────────┘
+                     │
+                     ▼
+┌────────────────────────────────────────────┐
+│  Does the task require >2 steps?           │
+└────────────┬───────────┬───────────────────┘
              │ Yes        │ No
              ▼            ▼
          Plan mode     Direct reply
-             │
-             ▼
-┌─────────────────────────────────────┐
-│  Match to known task type           │
-│  匹配预定义任务类型                   │
-└────┬──────┬──────┬──────┬──────┬────┘
-     │      │      │      │      │
-   dev  write research ops  design plan
 ```
 
-### 2.2 Phase sequencing / 阶段序列
+### 2.2 Phase sequencing with depth / 带深度的阶段序列
 
-Every task type maps to a fixed phase sequence. The agent executes phases in order, never skipping or reordering without user direction.
+| Type / 类型 | Phase sequence / 阶段序列 | Deep execution note / 深度执行要点 |
+|-------------|--------------------------|-----------------------------------|
+| Software dev | R → Front → Back → Integ → Del | Before coding, web_fetch similar projects for reference |
+| Content writing | Context → R → Research → Outline → Draft → Polish | Before drafting, search for actual data / quotes / cases |
+| Research & Analysis | Context → R → Data → Analysis → Viz → Del | Every data point must be from a real source |
+| Newsletter / Brief | Context → Scope → Gather → Org → Push | Gather from real feeds, not generated filler |
+| Platform ops | Context → Topic → Research → Draft → Design → Review | Search author's past content for tone consistency |
+| Data analysis | Context → R → Acquire → Clean → Analyze → Viz | Real datasets only |
+| Design | Context → Brief → Concept → Refine → Export | Search for style references |
+| Project planning | Context → Scope → Plan → Decompose → Risk → Pkg | Search for actual competitive landscape |
 
-| Type / 类型 | Phase sequence / 阶段序列 |
-|-------------|--------------------------|
-| Software dev / 软件开发 | Requirements → Frontend → Backend → Integration → Delivery |
-| Content writing / 内容写作 | Requirements → Research → Outline → Draft → Polish |
-| Research / 研究分析 | Requirements → Data → Analysis → Viz → Delivery |
-| Newsletter / 简报 | Scope → Gather → Organize → Push |
-| Platform ops / 内容平台 | Topic → Research → Draft → Design → Review |
-| Data analysis / 数据分析 | Requirements → Acquire → Clean → Analyze → Viz |
-| Design / 设计 | Brief → Concept → Refine → Export |
-| Project planning / 项目规划 | Scope → Plan → Decompose → Risk → Package |
-
-**Rule / 规则:** Requirements must always be Phase 1. Never start building before scope is confirmed.
+**Rule / 规则:** Phase 0 (Context Research) is mandatory for all task types. Skip only if user says "no research needed."
 
 ---
 
-## 3. Phase Definitions / 阶段定义
+## 3. Phase 0: Context Research / 背景研究（新增，强制）
 
-### 3.1 Software Development / 软件开发
+### 3.1 What to search for / 搜什么
 
-| Phase / 阶段 | Actions / 动作 | Output / 产出 | Completion / 完成标准 |
-|-------------|---------------|--------------|---------------------|
-| Requirements / 需求 | Define audience, features, tech stack | plan.md + feature spec | Core features + tech choices confirmed / 核心功能与技术方案确认 |
-| Frontend / 前端 | UI structure, interactions, styling | Source files | Core pages renderable / 核心页面可展示 |
-| Backend / 后端 | API, data model, business logic | Code + API docs | Core endpoints functional / 核心接口可用 |
-| Integration / 集成 | Frontend-backend wiring, testing | Test report + run guide | Build runs without error / 可运行 |
-| Delivery / 交付 | Documentation, packaging | README + deploy guide | User can operate independently / 用户可独立使用 |
+Before asking a single question, search for:
 
-### 3.2 Content Writing / 内容写作
+| Target / 搜索目标 | Tool / 工具 | Example / 示例 |
+|------------------|------------|---------------|
+| Any links the user provided in the request | `web_fetch(url)` | User says "write about our product ev-charge-x" → web_fetch their product page |
+| User's company / brand / past content | `exec(curl)` search or known source | "柳工" → search for brand info, recent news |
+| Domain-specific context | `web_fetch` or search API | "具身智能 2025 趋势" → gather latest data |
+| Reference materials | `web_fetch` links | Academic papers, competitor products |
 
-| Phase / 阶段 | Actions / 动作 | Output / 产出 | Completion / 完成标准 |
-|-------------|---------------|--------------|---------------------|
-| Requirements / 需求 | Audience, thesis, length, tone | plan.md | Direction confirmed / 方向确认 |
-| Research / 资料 | Search, collect references | Reference doc | Material ready / 素材到位 |
-| Outline / 大纲 | Structure, chapter breakdown | Outline doc | Structure confirmed / 结构确认 |
-| Draft / 正文 | Write chapters | Full draft | Draft complete / 文章完成 |
-| Polish / 排版 | Format, proofread, add visuals | Final doc | Ready to publish / 可发布 |
+### 3.2 Output / 产出
 
-### 3.3 Research & Analysis / 研究分析
+A **context summary** (saved as `plan.md` context section) containing:
 
-| Phase / 阶段 | Actions / 动作 | Output / 产出 | Completion / 完成标准 |
-|-------------|---------------|--------------|---------------------|
-| Requirements / 需求 | Question, scope, methodology | plan.md | Research plan confirmed / 方案确认 |
-| Data / 数据 | Gather industry data, trends | Data summary | Key data acquired / 数据到位 |
-| Analysis / 分析 | Breakdown, comparison, conclusions | Report body | Analysis complete / 分析完成 |
-| Viz / 图表 | Charts, graphs, images | Visuals + captions | Visuals ready / 图文齐备 |
-| Delivery / 交付 | Final review, formatting | Final report | Deliverable / 可交付 |
+- What I found about the user's context
+- Key data points / quotes / references I can use
+- What information is still missing that I need to ask
 
-### 3.4 Newsletter / Daily Briefing / 简报
+### 3.3 Anti-pattern / 反模式
 
-| Phase / 阶段 | Actions / 动作 | Output / 产出 | Completion / 完成标准 |
-|-------------|---------------|--------------|---------------------|
-| Scope / 范围 | Topic, coverage | Scope confirmed | Topic clear / 主题明确 |
-| Gather / 搜集 | Search latest info | Item list | 5-8 items / 5-8 条信息 |
-| Organize / 组织 | Categorize, summarize | Brief body | Content complete / 内容完成 |
-| Push / 推送 | Deliver to user | Message | Delivered / 已送达 |
+**Do NOT** ask questions that could have been answered by 30 seconds of web searching.
 
-### 3.5 Content Platform Operations / 内容平台运营
-
-| Phase / 阶段 | Actions / 动作 | Output / 产出 | Completion / 完成标准 |
-|-------------|---------------|--------------|---------------------|
-| Topic / 选题 | Angle, hook | Topic brief | Direction confirmed / 方向确定 |
-| Research / 资料 | Data, cases, references | Reference doc | Material ready / 素材到位 |
-| Draft / 初稿 | Write body | Article draft | Draft complete / 初稿完成 |
-| Design / 设计 | Cover image, layout | Formatted article | Ready to publish / 可发布 |
-| Review / 审核 | Check links, formatting | Final review | All clear / 确认无误 |
-
-### 3.6 Data Analysis / 数据分析
-
-| Phase / 阶段 | Actions / 动作 | Output / 产出 | Completion / 完成标准 |
-|-------------|---------------|--------------|---------------------|
-| Requirements / 需求 | Goal, data sources | plan.md | Goal confirmed / 目标明确 |
-| Acquire / 获取 | Download, scrape, query | Dataset | Data acquired / 数据到位 |
-| Clean / 清洗 | Format, handle anomalies | Cleaned data | Ready to analyze / 可分析 |
-| Analyze / 分析 | Statistics, modeling | Results | Conclusions drawn / 结论产出 |
-| Viz / 可视化 | Charts, dashboards | Visuals + annotations | Presentable / 可展示 |
-
-### 3.7 Design / 设计
-
-| Phase / 阶段 | Actions / 动作 | Output / 产出 | Completion / 完成标准 |
-|-------------|---------------|--------------|---------------------|
-| Brief / 需求 | Goals, style, use cases | Design brief | Direction confirmed / 方向确认 |
-| Concept / 概念 | Creative direction | Concept draft | Direction selected / 方向选定 |
-| Refine / 细化 | Polish colors, typography | Final design | Details complete / 细节完成 |
-| Delivery / 交付 | Source files, exports | Design package | Ready to use / 可投入使用 |
-
-### 3.8 Project Planning / 项目规划
-
-| Phase / 阶段 | Actions / 动作 | Output / 产出 | Completion / 完成标准 |
-|-------------|---------------|--------------|---------------------|
-| Scope / 范围 | Goals, constraints | Project brief | Scope defined / 范围确定 |
-| Plan / 方案 | Architecture, roadmap | Plan doc | Feasible / 方案可行 |
-| Decomposition / 分解 | Milestones, timeline | Execution plan | Actionable / 可落地 |
-| Risk / 风险 | Edge cases, fallbacks | Risk register | Known risks covered / 风险覆盖 |
-| Package / 交付 | Complete plan | Final plan | Ready for review / 可评审 |
+| Bad (don't do this) | Good (do this instead) |
+|--------------------|----------------------|
+| "What does Liugong do?" | "I found Liugong is a construction machinery manufacturer based in Liuzhou. Their core products include loaders, excavators, and rollers. Should I focus on their EV transition or their smart construction initiatives?" |
+| "Who is the audience of 电铲研讯?" | "I found 电铲研讯 covers new energy vehicles, energy storage, smart hardware, and embodied intelligence. Typical readers are industry professionals and tech enthusiasts. For this article, should I write at a professional or enthusiast level?" |
+| "What data do you need?" | "I searched for embodied AI market data 2025 and found a report forecasting $xxB by 2030. I'll use this as a starting point and add more sources as I go." |
 
 ---
 
-## 4. Agent Behavior Specification / 行为规范
+## 4. Phase Definitions / 阶段定义（带深度指引）
 
-### 4.1 First response / 第一响应
+### 4.1 Requirements gathering / 需求收集
 
-**Must include:** phase plan + first requirement question in a single output.
+#### 4.1.1 Before asking / 问之前
 
-**Must not:** ask for approval before proceeding. The plan is informative. If the user disagrees, they will say so.
+Always complete Phase 0 (context research) first. Your questions should demonstrate you've done your homework.
 
-**Format:**
+#### 4.1.2 Deep questioning pattern / 深挖式提问
+
+Don't accept generic answers. Push for specifics:
+
+| Template question / 模板 | Deep follow-up / 深挖追问 |
+|--------------------------|-------------------------|
+| "Who is the target user?" → they say "tech readers" | "Specifically, which tech readers? CTOs making purchase decisions, or developers building with it? Their reading depth and pain points are very different." |
+| "What are the key features?" → they list 3 | "If you had to prioritize by user pain, which feature solves the biggest real problem? Can you describe a scenario where a user would choose this over competitors?" |
+| "What style?" → they say "professional" | "What's a WeChat article from 电铲研讯 you liked? I'll match that tone." |
+
+#### 4.1.3 Auto-enhancement rule / 自动增强规则
+
+If after 3 rounds the user's answers are still generic → the agent must:
+1. Recognize: "I'm getting generic answers, I need to do my own research"
+2. Search independently for the topic
+3. Present findings to the user: "I found some specific data. Let me use this to fill in the gaps."
+
+### 4.2 Research / Data collection / 资料搜集
+
+**Must use real sources. Never fabricate data.**
+
+| Type / 类型 | Where to look / 去哪找 |
+|-------------|----------------------|
+| Industry data | `web_fetch` industry reports, news, government stats |
+| Company info | Company website, news, investor presentations |
+| Academic papers | arXiv, Nature, Google Scholar |
+| Market trends | News aggregators, HN, analyst reports |
+| User's past content | Author's public articles, social media |
+
+**Each source must be cited in the output.** If a source is unavailable, note it: "No public data found for X — using estimated range Y-Z based on comparable industries."
+
+### 4.3 Drafting / Output / 撰写产出
+
+**The output must contain real content, not just structure.**
+
+Before marking a phase complete, self-check:
+
 ```
-Phase plan:
-1. [Phase name] — [scope]
-2. [Phase name] — [scope]
-...
-
-Starting with Phase 1: [specific question about Phase 1]?
+Quality checklist:
+☐ Does this contain at least 3 specific data points / quotes / examples?
+☐ Did I cite real sources for each major claim?
+☐ If someone read just the output, would they learn something new?
+☐ Could this be mistaken for an AI template? (If yes → rewrite.)
 ```
 
-### 4.2 Requirements gathering / 需求收集
+If the output is "框架感" (framework-like, hollow), the agent must:
+1. Delete the filler
+2. Find real data to replace it
+3. Or ask the user: "I have the structure but the content feels hollow. Can you point me to a specific case or data source I should use?"
 
-- One question per turn
-- Max 2 follow-ups per question. If user cannot answer → provide a sensible default → mark as `confirmed_by_default`
+---
 
-### 4.3 Phase transition / 阶段切换
+## 5. Phase Transition / 阶段切换
 
 After each phase, output a completion report:
 
 ```
 [Phase N/M done] — [phase name]
 Output: [file / doc name]
+Real sources used: [count]
 Next: [Phase N+1]
 Phase: N/M
 ```
 
-Wait for user acknowledgment before proceeding to the next phase. If user is silent → proceed after 30 seconds.
-
-### 4.4 Allowed operations / 可执行操作
-
-| Operation / 操作 | When / 何时使用 |
-|-----------------|----------------|
-| Retrieve information (web_fetch, search) | Research / Data phases |
-| Create / edit documents | All phases |
-| Generate code | Dev phases |
-| Generate images | Design / Viz phases |
-| Validate output | Integration / Review phases |
-
-### 4.5 Completion criteria / 完成标准
-
-**Phase complete / 阶段完成:**
-- Output artifact produced / 产出物已生成
-- Completion criteria from section 3 met / 阶段完成标准已达
-- User can verify the output / 用户可验证
-
-**Task complete / 任务完成:**
-- All phases marked `done`
-- Final deliverable usable without further processing / 最终产出可直接使用
-- User notified / 已通知用户
+Wait for user acknowledgment. If user is silent → proceed after 30 seconds.
 
 ---
 
-## 5. Edge Cases / 边界处理
+## 6. Edge Cases / 边界处理
 
 | Scenario / 场景 | Handling / 处理方式 |
 |----------------|-------------------|
-| User says "just do it, no planning" | Skip plan mode, execute directly / 跳过规划，直接执行 |
-| User interrupts mid-phase | Stop current phase, handle interruption, resume or re-plan / 中断当前阶段，处理打断，恢复或重计划 |
-| Requirements unclear after 2 rounds | Default suggestion + `confirmed_by_default` tag / 默认建议 + 标记 |
-| Multi-agent dispatch needed | Split phases across agents, collect outputs, merge / 分阶段分配给多个 agent，汇总产出 |
-| User silent for > 30s after phase report | Proceed to next phase autonomously / 自动进入下一阶段 |
-| Task type unknown | Generate dynamic phase sequence from first principles / 从基本原则动态生成阶段序列 |
+| User says "just do it, no planning" | Skip Phase 0 + Requirements, but still do context research silently |
+| User gives generic answers for 3+ rounds | Auto-research mode: stop asking, find data yourself, present findings |
+| No real data available publicly | Note "no public data found" + provide estimated range + mark as `estimated` |
+| User interrupts mid-phase | Stop, handle interruption, resume or re-plan |
+| Multi-agent dispatch | Assign phases, each agent does its own Phase 0 context research |
+| User silent after phase report | Proceed to next phase after 30s |
+| Task type unknown | Generate dynamic phase sequence + research context first |
 
 ---
 
-## 6. Example / 示例
-
-### Scenario: "Write a report on EV market trends in 2026"
-
-**Agent (matching → Research & Analysis, section 3.3):**
+## 7. First Response Format / 第一响应
 
 ```
-Phase plan:
-1. Requirements — audience, scope, key questions
-2. Data collection — industry data, policy, trends
-3. Analysis — structured breakdown, comparison, conclusions
-4. Visualization — charts, graphs
-5. Delivery — final report
+Phase 0 complete — context researched: [what I found]
+Plan:
+1. [Phase] — [specific scope derived from context]
+2. ...
 
-Starting with Phase 1: Who is the audience for this report — internal stakeholders or public readers?
+Starting with Phase 1: [context-aware question]?
 ```
 
-**On completion of Phase 1:**
+**Before:**
+> "Who is your target audience?"
 
-```
-[Phase 1/5 done] — Requirements
-Output: plan.md (audience: public report, scope: global EV market 2025-2026, focus: battery tech and policy)
-Next: Phase 2 — Data collection
-Phase: 1/5
-```
+**After (with Phase 0):**
+> "I looked up 电铲研讯's recent articles — your readers are tech industry professionals following new energy and smart hardware. For this article on embodied AI, should I write at a professional analysis level (deeper, more technical) or a broader industry overview level (more accessible)?"
