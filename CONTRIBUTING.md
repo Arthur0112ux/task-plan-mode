@@ -1,53 +1,38 @@
 # Contributing
 
-欢迎参与 task-plan-mode 的改进！🎉
+Contributions are welcome! This is an open-source skill for AI agent task planning.
 
-## 如何贡献
+## Bug Reports
 
-### 🐛 报告问题
-- 通过 GitHub Issues 提交
-- 说明：重现步骤、预期行为、实际行为
-- 附上 agent 日志或截图更好
+- Open a [GitHub Issue](https://github.com/Arthur0112ux/task-plan-mode/issues)
+- Include: steps to reproduce, expected vs actual behavior
+- Attach agent logs or screenshots if relevant
 
-### 💡 建议新功能
-- 在 Issues 中描述场景和需求
-- 说明为什么这个功能对大家有用
+## Feature Suggestions
 
-### 🔀 提交代码/文档
-1. Fork 本仓库
-2. 创建分支：`git checkout -b feature/your-feature`
-3. 提交修改：`git commit -m "feat: add xxx"`
-4. 推送：`git push origin feature/your-feature`
-5. 提交 Pull Request
+- Describe the use case and expected behavior
+- Explain why this benefits other users
 
-### 📖 改进文档
-- 修正错别字、不通顺的表述
-- 添加更多使用示例
-- 翻译更多语言版本
+## Code / Documentation
 
-### 🌐 添加新领域脚手架
-- 在 `SKILL.md` 的"领域脚手架"章节添加
-- 附上典型使用场景说明
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Commit: `git commit -m "feat: add xxx"`
+4. Push: `git push origin feature/your-feature`
+5. Open a Pull Request
 
-## 开发指南
+## Commit Convention
 
-### 本地测试
-```bash
-# 将 SKILL.md 放入你的 agent skills 目录
-cp SKILL.md ~/.openclaw/skills/task-plan-mode/
+- `feat:` — new feature
+- `fix:` — bug fix
+- `docs:` — documentation
+- `refactor:` — code/restructure
+- `style:` — formatting
 
-# 重启 agent 后即可使用
-```
+## Guidelines
 
-### 提交规范
-- feat: 新功能
-- fix: 修复
-- docs: 文档变更
-- refactor: 重构
-- style: 格式调整
+- Be professional and constructive
+- Respect different viewpoints
+- Focus on the content, not the person
 
-## 行为准则
-
-- 友善、专业
-- 接受不同观点
-- 关注内容而非人
+Thank you for contributing!
