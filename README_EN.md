@@ -1,8 +1,21 @@
 # task-plan-mode — Plan Mode for AI Agents 🎯
 
+<p align="center">
+  <a href="https://github.com/Arthur0112ux/task-plan-mode/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+  <a href="https://github.com/Arthur0112ux/task-plan-mode/stargazers"><img src="https://img.shields.io/github/stars/Arthur0112ux/task-plan-mode?style=flat" alt="GitHub Stars"></a>
+  <a href="https://clawhub.ai/skills/task-plan-mode"><img src="https://img.shields.io/badge/clawhub-available-brightgreen" alt="ClawHub"></a>
+</p>
+
 > **Give your AI Agent the same capability as Codex Plan Mode**
 >
 > When users propose a complex task, the agent automatically enters planning mode, creates an independent workspace in memory, guides users step by step to clarify requirements, and automatically exits when enough information is gathered to begin execution.
+
+[English](./README_EN.md) · [中文](./README.md) · [SKILL](./SKILL.md) · [Examples](./examples/)
+
+**One-command install:**
+```bash
+npx clawhub@latest install task-plan-mode
+```
 
 ---
 
@@ -38,39 +51,63 @@ This skill enables the agent to automatically:
 
 ## 🚀 Quick Start
 
+### Install
+
 ```bash
+# Option 1: ClawHub (recommended)
+npx clawhub@latest install task-plan-mode
+
+# Option 2: Clone
 git clone https://github.com/Arthur0112ux/task-plan-mode.git
-# Place the SKILL.md in your agent's skills directory
+
+# Option 3: Manual
+# Download SKILL.md from GitHub and place in your skills directory
+```
+
+### Usage
+
+No configuration needed. The agent works automatically:
+
+```
+User: Help me build a used-book trading mini-program
+  ↓ Agent detects → complex task
+  ↓ Enters Plan Mode
+  ↓ Creates workspace → ~/memory/used-book-app/
+Agent: Who is this for?
+User: University students
+Agent: Top 3 features?
+User: Listing and browsing books
+Agent: Login method?
+User: WeChat OAuth
+  ↓ Info sufficient → auto exit Plan Mode
+  ↓ Generates plan.md
+  ↓ Begins execution
 ```
 
 ---
 
-## 📋 Built-in Domain Scaffolds
+## 📚 File Structure
 
-| Task Type | Decomposition Steps |
-|-----------|-------------------|
-| 🌐 Website/App | Users → Features → Tech Stack → Pages → Data → Design |
-| 📝 Article/Report | Readers → Thesis → Length → Sources → Style |
-| 🔬 Research | Question → Scope → Data → Method → Output |
+| File | Description |
+|------|-------------|
+| [SKILL.md](./SKILL.md) | Core OpenClaw agent skill |
+| [README.md](./README.md) | Chinese overview |
+| [README_EN.md](./README_EN.md) | English overview |
+| [examples/](./examples/) | Usage scenarios |
+| [docs/](./docs/) | Detailed documentation |
 
 ---
 
 ## 🤝 Contributing
 
-Issues and PRs welcome!
+- ⭐ Star the repo
+- 🐛 Open an Issue
+- 🔀 Submit a PR
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ---
 
 ## 📜 License
 
-MIT
-
----
-
-## 👥 Authors
-
-- **D Teacher** (DeepSeek V4) — Framework design, finalization
-- **Olin** (GPT-5.5) — Trigger rules, exit logic
-- **Penny** (Claude Code) — Workspace structure, docs
-
-Tripartite Discussion, 2026-05-17
+[MIT](./LICENSE) — Free to use, modify, and distribute

@@ -1,10 +1,22 @@
 # task-plan-mode — 任务规划模式 🎯
 
+<p align="center">
+  <a href="https://github.com/Arthur0112ux/task-plan-mode/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+  <a href="https://github.com/Arthur0112ux/task-plan-mode/stargazers"><img src="https://img.shields.io/github/stars/Arthur0112ux/task-plan-mode?style=flat" alt="GitHub Stars"></a>
+  <a href="https://clawhub.ai/skills/task-plan-mode"><img src="https://img.shields.io/badge/clawhub-available-brightgreen" alt="ClawHub"></a>
+  <a href="https://github.com/Arthur0112ux/task-plan-mode/releases"><img src="https://img.shields.io/github/v/release/Arthur0112ux/task-plan-mode" alt="Version"></a>
+</p>
+
 > **让你的 AI Agent 拥有「Codex Plan Mode」一样的能力**
 >
 > 当用户提出复杂任务时，agent 自动进入规划模式，在记忆区创建独立 workspace，逐步引导用户明确需求，并在信息足够时自动退出、进入执行。
 
-[中文] · [English](./README_EN.md) · [SKILL 说明](./SKILL.md) · [使用示例](./examples/)
+[中文](./README.md) · [English](./README_EN.md) · [SKILL 说明](./SKILL.md) · [使用示例](./examples/)
+
+**一键安装：**
+```bash
+npx clawhub@latest install task-plan-mode
+```
 
 ---
 
@@ -43,22 +55,26 @@
 ### 安装
 
 ```bash
-# 克隆仓库
-git clone https://github.com/Arthur0112ux/task-plan-mode.git ~/Desktop/AI共享技能库/共享技能/task-plan-mode
+# 方式一：ClawHub 一键安装（推荐）
+npx clawhub@latest install task-plan-mode
 
-# 或者在 OpenClaw 中直接加载
-# 将 SKILL.md 放入你的 skills 目录即可
+# 方式二：克隆仓库
+git clone https://github.com/Arthur0112ux/task-plan-mode.git
+
+# 方式三：手动下载 SKILL.md
+# 访问 https://github.com/Arthur0112ux/task-plan-mode/blob/main/SKILL.md
+# 复制内容放入你的 skills 目录
 ```
 
 ### 使用
 
-安装后，agent 会自动按以下方式工作：
+安装后无需任何配置，agent 会自动工作：
 
 ```
 用户：帮我做一个二手书交易小程序
   ↓ agent 自动检测 → 复杂任务
   ↓ 进入 Plan Mode
-  ↓ workspace 创建 → ~/Desktop/D老师记忆/二手书小程序/
+  ↓ workspace 创建 → ~/记忆区/二手书小程序/
 Agent：这个二手书小程序主要是给谁用的？
 用户：广西大学的学生
 Agent：最核心的 3 个功能是什么？
@@ -75,9 +91,9 @@ Agent：登录方式？
 ## 🏗️ 工作区结构
 
 ```
-~/Desktop/D老师记忆/{项目名}/
+~/记忆区/{项目名}/
 ├── README.md          # 任务总览
-├── plan.md            # 拆解计划
+├── plan.md            # 拆解计划（阶段表）
 ├── context/           # 需求收集记录
 │   ├── 01-需求对齐.md
 │   ├── 02-功能确认.md
@@ -91,26 +107,30 @@ Agent：登录方式？
 
 | 任务类型 | 拆解环节 |
 |---------|---------|
-| 🌐 网站/小程序 | 目标用户 → 核心功能 → 技术选型 → 页面结构 → 数据需求 → 设计风格 |
-| 📝 文章/报告 | 目标读者 → 核心论点 → 篇幅 → 数据来源 → 风格 |
-| 🔬 研究/分析 | 研究问题 → 范围界定 → 数据需求 → 分析方法 → 输出格式 |
+| 🌐 **网站/小程序** | 目标用户 → 核心功能 → 技术选型 → 页面结构 → 数据需求 → 设计风格 |
+| 📝 **文章/报告** | 目标读者 → 核心论点 → 篇幅 → 数据来源 → 风格 |
+| 🔬 **研究/分析** | 研究问题 → 范围界定 → 数据需求 → 分析方法 → 输出格式 |
 
 其他类型：agent 自动生成领域专用脚手架。
 
 ---
 
-## 🔧 触发规则
+## 🔧 触发方式
 
 ### 自动触发
-- 用户说"做一个X"（网站/开发/小程序等）
-- 任务涉及 3 个以上步骤
-- 需求模糊、缺关键信息
-- 用户说"先规划一下"
+| 场景 | 说明 |
+|------|------|
+| ✅ 用户说"做一个X" | 做网站/开发/小程序/报告等 |
+| ✅ 任务涉及 3+ 步骤 | agent 内部自动评估 |
+| ✅ 需求模糊 | 缺关键信息，agent 自动切规划 |
+| ✅ "先规划一下" | 用户明确要求先拆解 |
 
 ### 手动触发
-- "切任务模式" / "Plan Mode"
-- "帮我拆解一下"
-- "这个任务比较复杂"
+| 关键词 | 说明 |
+|--------|------|
+| "切任务模式" / "Plan Mode" | 手动进入 |
+| "帮我拆解一下" | 要求拆解 |
+| "这个任务比较复杂" | 提示 agent 切模式 |
 
 ---
 
@@ -119,31 +139,24 @@ Agent：登录方式？
 | 文件 | 说明 |
 |------|------|
 | [SKILL.md](./SKILL.md) | OpenClaw agent skill 文件（核心） |
-| [README.md](./README.md) | 本文件，项目总览 |
-| [README_EN.md](./README_EN.md) | English version |
-| [examples/](./examples/) | 使用示例 |
-| [docs/](./docs/) | 详细文档 |
+| [README.md](./README.md) | 中文总览 |
+| [README_EN.md](./README_EN.md) | English overview |
+| [examples/](./examples/) | 使用场景示例 |
+| [docs/](./docs/) | 详细设计文档 |
 
 ---
 
-## 🤝 如何贡献
+## 🤝 如何参与
 
-- 提交 Issue：报告问题或建议新功能
-- 提交 PR：改进文档或代码
-- 分享使用经验：欢迎在 Issue 中贴出你的使用案例
+- ⭐ **Star** — 让更多人看到
+- 🐛 **Issue** — 报告问题或建议功能
+- 🔀 **PR** — 改进文档或逻辑
+- 📢 **分享** — 告诉朋友这个工具
+
+详见 [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ---
 
 ## 📜 许可证
 
-[MIT](./LICENSE)
-
----
-
-## 👥 作者
-
-- **D老师**（DeepSeek V4）— 框架设计、整合定稿
-- **Olin**（GPT-5.5）— 触发规则、退出逻辑
-- **Penny**（Claude Code）— Workspace 结构、文档规范
-
-三方会谈共创，2026-05-17
+[MIT](./LICENSE) — 自由使用、修改、分发
