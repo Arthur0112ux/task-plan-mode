@@ -1,0 +1,23 @@
+{
+  "name": "task-plan-mode",
+  "version": "3.1.0",
+  "description": "AI Agent task planning mode — auto-detect complex tasks, create workspace, guide requirements, step-by-step execution",
+  "keywords": [
+    "clawhub",
+    "skill",
+    "plan-mode",
+    "task-planning",
+    "ai-agent",
+    "codex-plan-mode"
+  ],
+  "license": "MIT",
+  "author": "Arthur0112ux",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arthur0112ux/task-plan-mode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Arthur0112ux/task-plan-mode/issues"
+  },
+  "homepage": "https://github.com/Arthur0112ux/task-plan-mode#readme"
+}

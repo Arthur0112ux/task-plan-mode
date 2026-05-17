@@ -1,0 +1,7 @@
+{
+  "name": "task-plan-mode",
+  "description": "When user proposes a complex task, agent enters plan mode: creates workspace, guides requirements, executes step by step.",
+  "version": "3.1.0",
+  "category": "workflow",
+  "compatibility": "openclaw"
+}

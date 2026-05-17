@@ -1,113 +1,99 @@
-# task-plan-mode — Plan Mode for AI Agents 🎯
+# task-plan-mode — AI Agent Task Planning Mode 🎯
 
 <p align="center">
   <a href="https://github.com/Arthur0112ux/task-plan-mode/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
-  <a href="https://github.com/Arthur0112ux/task-plan-mode/stargazers"><img src="https://img.shields.io/github/stars/Arthur0112ux/task-plan-mode?style=flat" alt="GitHub Stars"></a>
   <a href="https://clawhub.ai/skills/task-plan-mode"><img src="https://img.shields.io/badge/clawhub-available-brightgreen" alt="ClawHub"></a>
+  <a href="https://github.com/Arthur0112ux/task-plan-mode/releases"><img src="https://img.shields.io/github/v/release/Arthur0112ux/task-plan-mode" alt="Version"></a>
+  <a href="https://github.com/Arthur0112ux/task-plan-mode"><img src="https://img.shields.io/github/stars/Arthur0112ux/task-plan-mode?style=flat" alt="GitHub Stars"></a>
 </p>
 
-> **Give your AI Agent the same capability as Codex Plan Mode**
->
-> When users propose a complex task, the agent automatically enters planning mode, creates an independent workspace in memory, guides users step by step to clarify requirements, and automatically exits when enough information is gathered to begin execution.
+> **Give your AI Agent Codex-like Plan Mode: auto-detect complexity, break down tasks, execute phase by phase.**
 
-[English](./README_EN.md) · [中文](./README.md) · [SKILL](./SKILL.md) · [Examples](./examples/)
+---
 
-**One-command install:**
+## What It Does
+
+When a user proposes a complex task (build a website, write a report, design a system), the agent:
+
+1. **Recognizes** task complexity and maps it to a standard execution template
+2. **Reveals the plan** as part of the first response — no pause for approval
+3. **Executes phase by phase**, reporting progress after each
+4. **Delivers** when all phases are complete
+
+No separate "can I proceed?" step. Plans unfold as the conversation flows, just like Codex Plan Mode.
+
+---
+
+## Quick Start
+
 ```bash
 npx clawhub@latest install task-plan-mode
 ```
 
----
+Once installed, the skill activates **automatically** when a user says:
 
-## 📖 What is this?
+> "Build me a second-hand book trading mini-program"
+> "Write a report on EV battery trends"
+> "Design a landing page for our product"
 
-**task-plan-mode** is an OpenClaw agent skill that solves one core problem:
-
-> **When users ask for complex tasks, they often don't know what preparation is needed. The Agent knows.**
-
-For example, when a user says "Help me build a used-book trading mini-program" —
-the user only knows the end goal, but doesn't know the steps needed (target users → core features → tech stack → page structure → data design → style).
-
-This skill enables the agent to automatically:
-1. Detect task complexity and enter planning mode
-2. Create an independent workspace in memory
-3. Ask one question at a time, exit when info is sufficient
-4. Enter execution phase, deliver step by step per plan
+Or **manually** by typing: `Plan Mode` / `plan mode` / `帮我拆解`
 
 ---
 
-## ✨ Key Features
+## Default Task Types
 
-| Feature | Description |
-|---------|-------------|
-| 🧠 **Auto-trigger** | No manual commands — agent judges complexity automatically |
-| 📂 **Workspace** | Independent workspace per task |
-| 👣 **Step-by-step** | One question at a time, user never gets lost |
-| 🔄 **Auto-exit** | Exit immediately when info is sufficient |
-| 🏗️ **Domain scaffolding** | Different frameworks for websites, reports, research |
-| 📝 **Full trace** | All planning steps saved to files |
+| Category | Phases |
+|----------|--------|
+| **Software Development** | Requirements → Frontend → Backend → Integration → Delivery |
+| **Content Writing** | Requirements → Research → Outline → Draft → Polish |
+| **Research & Analysis** | Requirements → Data Collection → Analysis → Viz → Delivery |
+| **Newsletter / Briefing** | Scope → Gather → Organize → Push |
+| **Content Platform** | Topic → Research → Draft → Design → Review |
+| **Data Analysis** | Requirements → Acquire → Clean → Analyze → Visualize |
+| **Design** | Brief → Concept → Refine → Export |
+| **Project Planning** | Scope → Blueprint → Milestones → Risk → Package |
+
+Each phase specifies **what to produce** and **completion criteria**.
 
 ---
 
-## 🚀 Quick Start
-
-### Install
-
-```bash
-# Option 1: ClawHub (recommended)
-npx clawhub@latest install task-plan-mode
-
-# Option 2: Clone
-git clone https://github.com/Arthur0112ux/task-plan-mode.git
-
-# Option 3: Manual
-# Download SKILL.md from GitHub and place in your skills directory
-```
-
-### Usage
-
-No configuration needed. The agent works automatically:
+## How It Works
 
 ```
-User: Help me build a used-book trading mini-program
-  ↓ Agent detects → complex task
-  ↓ Enters Plan Mode
-  ↓ Creates workspace → ~/memory/used-book-app/
-Agent: Who is this for?
-User: University students
-Agent: Top 3 features?
-User: Listing and browsing books
-Agent: Login method?
-User: WeChat OAuth
-  ↓ Info sufficient → auto exit Plan Mode
-  ↓ Generates plan.md
-  ↓ Begins execution
+User: "Write a report on EV market trends in 2026"
+
+Agent (matching → Research & Analysis):
+→ "Got it. I'll work through 5 phases:
+   ① Requirements — audience & scope
+   ② Data collection — industry data & trends
+   ③ Analysis — structured breakdown
+   ④ Charts & visuals
+   ⑤ Delivery
+   
+   Let's start with Phase 1: Who is this report for — internal stakeholders or public?"
 ```
 
 ---
 
-## 📚 File Structure
+## Project Structure
 
-| File | Description |
-|------|-------------|
-| [SKILL.md](./SKILL.md) | Core OpenClaw agent skill |
-| [README.md](./README.md) | Chinese overview |
-| [README_EN.md](./README_EN.md) | English overview |
-| [examples/](./examples/) | Usage scenarios |
-| [docs/](./docs/) | Detailed documentation |
-
----
-
-## 🤝 Contributing
-
-- ⭐ Star the repo
-- 🐛 Open an Issue
-- 🔀 Submit a PR
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
+```
+task-plan-mode/
+├── SKILL.md              ← Full skill definition (core)
+├── package.json          ← npm/ClawHub metadata
+├── clawhub.json          ← ClawHub config
+├── CHANGELOG.md          ← Version history
+├── README.md             ← This file
+├── README_EN.md          ← 中文 readme
+├── LICENSE               ← MIT
+├── docs/                 ← Design docs
+│   ├── design-principles.md
+│   └── triggers.md
+└── examples/             ← Usage examples
+```
 
 ---
 
-## 📜 License
+## License
 
-[MIT](./LICENSE) — Free to use, modify, and distribute
+MIT — use, modify, distribute freely.
