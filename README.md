@@ -74,9 +74,9 @@ git clone https://github.com/Arthur0112ux/task-plan-mode.git
 用户：帮我做一个二手书交易小程序
   ↓ agent 自动检测 → 复杂任务
   ↓ 进入 Plan Mode
-  ↓ workspace 创建 → ~/记忆区/二手书小程序/
+  ↓ workspace 创建 → ~/.task-plan-mode/workspace/二手书小程序/
 Agent：这个二手书小程序主要是给谁用的？
-用户：广西大学的学生
+用户：大学生
 Agent：最核心的 3 个功能是什么？
 用户：发布和浏览
 Agent：登录方式？
@@ -91,7 +91,7 @@ Agent：登录方式？
 ## 🏗️ 工作区结构
 
 ```
-~/记忆区/{项目名}/
+~/.task-plan-mode/workspace/{项目名}/
 ├── README.md          # 任务总览
 ├── plan.md            # 拆解计划（阶段表）
 ├── context/           # 需求收集记录
