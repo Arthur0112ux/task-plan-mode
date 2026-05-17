@@ -141,8 +141,20 @@ Agent：登录方式？
 | [SKILL.md](./SKILL.md) | OpenClaw agent skill 文件（核心） |
 | [README.md](./README.md) | 中文总览 |
 | [README_EN.md](./README_EN.md) | English overview |
-| [examples/](./examples/) | 使用场景示例 |
+| [触发词速查表](./docs/triggers.md) | 所有触发词一览 |
+| [examples/](./examples/) | 内置场景示例（6个） |
 | [docs/](./docs/) | 详细设计文档 |
+
+## 📖 内置场景示例
+
+| 场景 | 文件 | 类型 |
+|------|------|------|
+| 📱 二手书交易小程序 | [examples/used-book-miniapp.md](./examples/used-book-miniapp.md) | 小程序开发 |
+| 💰 记账 App | [examples/budget-app.md](./examples/budget-app.md) | App 开发 |
+| 🤖 人形机器人行业报告 | [examples/industry-report.md](./examples/industry-report.md) | 研究分析 |
+| 📝 个人技术博客 | [examples/personal-blog.md](./examples/personal-blog.md) | 网站开发 |
+| 🛒 社区团购小程序 | [examples/community-group-buy.md](./examples/community-group-buy.md) | 产品方案 |
+| 📊 深度行业分析 | [examples/deep-report.md](./examples/deep-report.md) | 报告写作 |
 
 ---
 
