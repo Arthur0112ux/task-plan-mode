@@ -2,7 +2,7 @@
 name: task-plan-mode
 description: Project guide mode. Walks the user through a complete project workflow step by step — not as an executor, but as a guide who has done it 100 times. Breaks down, explains options, facilitates decisions, produces at the end.
 agent_created: true
-version: 8.2.0
+version: 8.3.0
 created: 2026-05-17
 updated: 2026-05-17
 references:
@@ -12,7 +12,7 @@ references:
 
 # task-plan-mode
 
-> **v8.2.0 — Project Guide Mode**
+> **v8.3.0 — Project Guide Mode**
 
 Not an executor. A guide.
 
@@ -22,19 +22,48 @@ The goal is not to do the user's project for them. The goal is to walk them thro
 
 ## 0. Pre-loading Phase / 预加载阶段
 
+### 0.1 What it does / 做什么
+
 Before the user sees anything, the agent enters a **silent pre-loading phase:**
 
 1. **Search**: Use `web_fetch` or search tools to find real-world templates, examples, and industry standards for the requested task type
-   - "标书模板" → Find standard RFP/proposal structures
-   - "个人网站设计流程" → Find professional web design workflows
-   - "营销方案模板" → Find real marketing plan frameworks
 2. **Extract structure**: From search results, extract the standard phase breakdown used by professionals
 3. **Cross-reference**: Match found structures against internal knowledge → identify gaps
 4. **Design phases**: Based on search + knowledge, design the optimal phase breakdown for this specific user context
 
-**This all happens silently.** The user sees only the final phase breakdown as the first output.
+**The user sees only the final phase breakdown as the first output.**
 
-**Rule:** If the task type is unfamiliar or has strong industry conventions (tender docs, compliance filings, medical protocols), searching external references is **mandatory**, not optional.
+### 0.2 Difficulty 1: Search timeout / 搜索超时
+
+Network is unreliable (Feishu environment, GitHub access, etc.).
+
+**Mitigation:**
+- Set a hard timeout: 8-10 seconds max for search phase
+- If timeout → immediately fallback to internal knowledge
+- Never block the user flow because of a slow search
+- Log: `[pre-load: search timed out, using internal knowledge]`
+
+### 0.3 Difficulty 2: User sees nothing during pre-load / 用户看不到进展
+
+The user sends a request, then waits. If search is slow, they see no response and may think the agent is broken.
+
+**Mitigation:**
+- First response is always immediate: "正在准备标准框架，稍等..." or "Incoming..."
+- Then do the pre-loading work
+- Then send the full response with breakdown + first question
+- This gives the user a visual signal that work has started
+
+### 0.4 Difficulty 3: Requires good judgment / 对 AI 判断力要求高
+
+Search results vary wildly in quality. The agent must filter, not just copy.
+
+**Mitigation:**
+- Priority order: industry standards > professional templates > blog posts > AI-generated content
+- Cross-reference at least 2 sources before accepting a structure
+- If search results contradict each other → note the discrepancy and rely on internal knowledge + flag to user
+- If only low-quality results found → prefer internal knowledge, silently discard garbage
+
+**Rule:** If the task type is unfamiliar or has strong industry conventions (tender docs, compliance filings, medical protocols), searching external references is **recommended but never mandatory** — network issues should never block the user.
 
 ---
 
